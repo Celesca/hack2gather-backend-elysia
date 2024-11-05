@@ -12,6 +12,11 @@ To start the development server run:
 bun run dev
 ```
 
+Sync the prisma schema with the MySQL
+
+`bunx prisma migrate dev --name init`
+
+
 Open http://localhost:3000/ with your browser to see the result.
 
 Backlogs for the Swipe Feature :
