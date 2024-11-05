@@ -9,6 +9,62 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  UserID        String     @id @default(uuid()) // Primary Key
+  UserName      String
+  MessagesSent  Message[]  @relation("MessagesSent")
+  MessagesReceived Message[] @relation("MessagesReceived")
+  SwipesMade    Swipe[]    @relation("SwipesMade")
+  SwipesReceived Swipe[]   @relation("SwipesReceived")
+  Notifications Notification[]
+  UserSkills    UserSkills[] // Relation to UserSkills (many-to-many with Skills)
+}
+
+model Message {
+  MessageID     Int       @id @default(autoincrement()) // Primary Key
+  Sender        User      @relation("MessagesSent", fields: [SenderID], references: [UserID])
+  SenderID      String
+  Receiver      User      @relation("MessagesReceived", fields: [ReceiverID], references: [UserID])
+  ReceiverID    String
+  MessageContent String
+  Timestamp     DateTime  @default(now())
+  ReadStatus    Boolean   @default(false)
+}
+
+model Swipe {
+  SwipeID       Int       @id @default(autoincrement()) // Primary Key
+  SwipingUser   User      @relation("SwipesMade", fields: [SwipingUserID], references: [UserID])
+  SwipingUserID String
+  SwipedUser    User      @relation("SwipesReceived", fields: [SwipedUserID], references: [UserID])
+  SwipedUserID  String
+  SwipeAction   String    // "Like" or "Dislike"
+  Timestamp     DateTime  @default(now())
+}
+
+model Notification {
+  NotificationID Int      @id @default(autoincrement()) // Primary Key
+  User           User     @relation(fields: [UserID], references: [UserID])
+  UserID         String
+  NotificationContent String
+  Timestamp      DateTime @default(now())
+  ReadStatus     Boolean  @default(false)
+}
+
+model Skills {
+  Skill_ID     Int        @id @default(autoincrement()) // Primary Key
+  Skill_Name   String     @unique // Unique skill name
+  UserSkills   UserSkills[] // Relation to UserSkills
+}
+
+model UserSkills {
+  UserSkill_ID Int        @id @default(autoincrement()) // Primary Key
+  User         User       @relation(fields: [UserID], references: [UserID])
+  UserID       String
+  Skill        Skills     @relation(fields: [Skill_ID], references: [Skill_ID])
+  Skill_ID     Int
+  // Add more fields if you need, like skill level or proficiency
 }
