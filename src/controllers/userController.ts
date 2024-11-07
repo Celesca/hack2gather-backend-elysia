@@ -7,14 +7,14 @@ export const userController = new Elysia({ prefix: "/user" })
   .post(
     "/create",
     async ({ body, error }) => {
-      const { userID, userName } = body;
+      const { userID, userName, email, password, workingStyle, profileImage, bio } = body;
 
       const existingUser = await prisma.user.findUnique({
         where: { UserID: userID },
       });
 
       if (existingUser) {
-        return error(409, "User already exists"); // Conflict error if user exists
+        return error(409, "User already exists");
       }
 
       // Create the new user
@@ -22,6 +22,11 @@ export const userController = new Elysia({ prefix: "/user" })
         data: {
           UserID: userID,
           UserName: userName,
+          Email: email,
+          Password: password,
+          WorkingStyle: workingStyle,
+          ProfileImage: profileImage,
+          Bio: bio,
         },
       });
 
@@ -31,6 +36,11 @@ export const userController = new Elysia({ prefix: "/user" })
       body: t.Object({
         userID: t.String(),
         userName: t.String(),
+        email: t.String(),
+        password: t.String(),
+        workingStyle: t.String(),
+        profileImage: t.String(),
+        bio: t.String(),
       }),
     }
   )
