@@ -7,15 +7,18 @@ export const userController = new Elysia({ prefix: "/user" })
   .post(
     "/create",
     async ({ body, error }) => {
-      const { userID, userName, email, password, workingStyle, profileImage, bio } = body;
+      const { userName, email, password, workingStyle, profileImage, bio } = body;
 
       const existingUser = await prisma.user.findUnique({
-        where: { UserID: userID },
+        where: { Email: email },
       });
 
       if (existingUser) {
         return error(409, "User already exists");
       }
+
+      // Generate a unique user ID
+      const userID = Math.random().toString(36).substr(2, 9);
 
       // Create the new user
       const newUser = await prisma.user.create({
