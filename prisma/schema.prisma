@@ -69,7 +69,7 @@ model UserSkills {
   UserSkill_ID Int        @id @default(autoincrement()) // Primary Key
   User         User       @relation(fields: [UserID], references: [UserID])
   UserID       String
-  Skill        Skills     @relation(fields: [Skill_ID], references: [Skill_ID])
+  Skill        Skills     @relation(fields: [Skill_ID], references: [Skill_ID], onDelete: Cascade)
   Skill_ID     Int
   // Add more fields if you need, like skill level or proficiency
 }

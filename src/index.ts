@@ -1,13 +1,15 @@
 import { Elysia } from "elysia";
-import { swipeController } from "./controllers/swipeController";
 import { swagger } from "@elysiajs/swagger";
+import { swipeController } from "./controllers/swipeController";
 import { userController } from "./controllers/userController";
+import { skillController } from "./controllers/skillController";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
   .use(swagger())
   .use(swipeController)
   .use(userController)
+  .use(skillController)
   .listen(3000);
 
 console.log(
