@@ -16,6 +16,11 @@ datasource db {
 model User {
   UserID        String     @id @default(uuid()) // Primary Key
   UserName      String
+  Email         String     @unique
+  Password      String
+  WorkingStyle  String?
+  ProfileImage  String?
+  Bio           String?
   MessagesSent  Message[]  @relation("MessagesSent")
   MessagesReceived Message[] @relation("MessagesReceived")
   SwipesMade    Swipe[]    @relation("SwipesMade")

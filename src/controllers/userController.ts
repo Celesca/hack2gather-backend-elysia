@@ -7,34 +7,47 @@ export const userController = new Elysia({ prefix: "/user" })
   .post(
     "/create",
     async ({ body, error }) => {
-      const { userID, userName } = body;
+      const { userName, email, password, workingStyle, profileImage, bio } = body;
 
-      // Check if the user already exists
       const existingUser = await prisma.user.findUnique({
-        where: { UserID: userID },
+        where: { Email: email },
       });
 
       if (existingUser) {
-        return error(409, "User already exists"); // Conflict error if user exists
+        return error(409, "User already exists");
       }
+
+      // Generate a unique user ID
+      const userID = Math.random().toString(36).substr(2, 9);
+
+      const hashPassword = await Bun.password.hash(password);
 
       // Create the new user
       const newUser = await prisma.user.create({
         data: {
           UserID: userID,
           UserName: userName,
+          Email: email,
+          Password: hashPassword,
+          WorkingStyle: workingStyle,
+          ProfileImage: profileImage,
+          Bio: bio,
         },
       });
 
       return newUser; // Return the newly created user
-    },
-    {
+        },
+        {
       body: t.Object({
-        userID: t.String(),
         userName: t.String(),
+        email: t.String(),
+        password: t.String(),
+        workingStyle: t.Optional(t.String()),
+        profileImage: t.Optional(t.String()),
+        bio: t.Optional(t.String()),
       }),
-    }
-  )
+        }
+      )
 
   // Get user details by userID
   .get(
@@ -68,7 +81,7 @@ export const userController = new Elysia({ prefix: "/user" })
 
   // Update user profile
   .put(
-    "/:userID/update",
+    "/:userID",
     async ({ params: { userID }, body, error }) => {
       const { userName } = body;
 
@@ -103,7 +116,7 @@ export const userController = new Elysia({ prefix: "/user" })
 
   // Delete user profile
   .delete(
-    "/:userID/delete",
+    "/:userID",
     async ({ params: { userID }, error }) => {
       // Check if the user exists
       const user = await prisma.user.findUnique({
