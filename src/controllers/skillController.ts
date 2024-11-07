@@ -50,7 +50,7 @@ export const skillController = new Elysia({ prefix: "/skill" })
             skillName: t.String(),
         }),
     }
-)
+    )
 
     // Add skill to user
     .post(
