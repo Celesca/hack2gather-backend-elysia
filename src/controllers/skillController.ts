@@ -31,6 +31,27 @@ export const skillController = new Elysia({ prefix: "/skill" })
         }
     )
 
+    .delete(":skillName", async ({ params: { skillName }, error }) => {
+        const skill = await prisma.skills.findUnique({
+            where: { Skill_Name: skillName },
+        });
+
+        if (!skill) {
+            return error(404, "Skill not found");
+        }
+
+        await prisma.skills.delete({
+            where: { Skill_Name: skillName },
+        });
+
+        return { message: "Skill deleted successfully" };
+    }, {
+        params: t.Object({
+            skillName: t.String(),
+        }),
+    }
+)
+
     // Add skill to user
     .post(
         "/add-to-user",
