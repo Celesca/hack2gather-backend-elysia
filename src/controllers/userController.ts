@@ -81,7 +81,7 @@ export const userController = new Elysia({ prefix: "/user" })
 
   // Update user profile
   .put(
-    "/:userID/update",
+    "/update/:userID",
     async ({ params: { userID }, body, error }) => {
       const { userName } = body;
 
@@ -116,7 +116,7 @@ export const userController = new Elysia({ prefix: "/user" })
 
   // Delete user profile
   .delete(
-    "/:userID/delete",
+    "/:userID",
     async ({ params: { userID }, error }) => {
       // Check if the user exists
       const user = await prisma.user.findUnique({
