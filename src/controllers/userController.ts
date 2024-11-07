@@ -20,13 +20,15 @@ export const userController = new Elysia({ prefix: "/user" })
       // Generate a unique user ID
       const userID = Math.random().toString(36).substr(2, 9);
 
+      const hashPassword = await Bun.password.hash(password);
+
       // Create the new user
       const newUser = await prisma.user.create({
         data: {
           UserID: userID,
           UserName: userName,
           Email: email,
-          Password: password,
+          Password: hashPassword,
           WorkingStyle: workingStyle,
           ProfileImage: profileImage,
           Bio: bio,
