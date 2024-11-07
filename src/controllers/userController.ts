@@ -9,7 +9,6 @@ export const userController = new Elysia({ prefix: "/user" })
     async ({ body, error }) => {
       const { userID, userName } = body;
 
-      // Check if the user already exists
       const existingUser = await prisma.user.findUnique({
         where: { UserID: userID },
       });
