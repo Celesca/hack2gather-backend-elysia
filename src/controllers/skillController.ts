@@ -3,7 +3,6 @@ import { prisma } from "../prisma"; // Prisma client
 
 export const skillController = new Elysia({ prefix: "/skill" })
 
-  // Create a new skill
   .post(
     "/create",
     async ({ body, error }) => {
