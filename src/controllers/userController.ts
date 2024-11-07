@@ -36,19 +36,18 @@ export const userController = new Elysia({ prefix: "/user" })
       });
 
       return newUser; // Return the newly created user
-    },
-    {
+        },
+        {
       body: t.Object({
-        userID: t.String(),
         userName: t.String(),
         email: t.String(),
         password: t.String(),
-        workingStyle: t.String(),
-        profileImage: t.String(),
-        bio: t.String(),
+        workingStyle: t.Optional(t.String()),
+        profileImage: t.Optional(t.String()),
+        bio: t.Optional(t.String()),
       }),
-    }
-  )
+        }
+      )
 
   // Get user details by userID
   .get(
