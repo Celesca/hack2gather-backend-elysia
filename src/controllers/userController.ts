@@ -81,7 +81,7 @@ export const userController = new Elysia({ prefix: "/user" })
 
   // Update user profile
   .put(
-    "/update/:userID",
+    "/:userID",
     async ({ params: { userID }, body, error }) => {
       const { userName } = body;
 
