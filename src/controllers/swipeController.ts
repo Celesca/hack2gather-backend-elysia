@@ -39,8 +39,8 @@ export const swipeController = new Elysia({ prefix: "/swipe" })
 
   // Process a swipe action (Like or Dislike)
   .post(
-    "/:userID/swipe",
-    async ({ params: { userID }, body: { swipedUserID, swipeAction }, error }) => {
+    "/action",
+    async ({ body: { userID, swipedUserID, swipeAction }, error }) => {
       // Check if the swipe action is valid ("Like" or "Dislike")
       if (!["Like", "Dislike"].includes(swipeAction)) {
         return error(400, "Invalid swipe action");
@@ -94,11 +94,9 @@ export const swipeController = new Elysia({ prefix: "/swipe" })
     },
     {
       body: t.Object({
+        userID: t.String(),
         swipedUserID: t.String(),
         swipeAction: t.String(), // "Like" or "Dislike"
-      }),
-      params: t.Object({
-        userID: t.String(),
       }),
     }
   );
