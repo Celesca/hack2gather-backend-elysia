@@ -77,4 +77,32 @@ export const messageController = new Elysia({ prefix: "/message" })
 
       return messages;
     }
+  )
+
+  // Query the message from each users that users contact with
+  .get(
+    "/inbox/:userID",
+    async ({ params, error }) => {
+      const { userID } = params;
+
+      // Check if the user exists
+      const user = await prisma.user.findUnique({
+        where: { UserID: userID },
+      });
+
+      if (!user) {
+        return error(404, "User not found");
+      }
+
+      // Get the latest message from each conversation
+      const latestMessages = await prisma.$queryRaw`
+        SELECT DISTINCT ON (LEAST("SenderID", "ReceiverID"), GREATEST("SenderID", "ReceiverID"))
+          "MessageID", "SenderID", "ReceiverID", "MessageContent", "Timestamp"
+        FROM "Message"
+        WHERE "SenderID" = ${userID} OR "ReceiverID" = ${userID}
+        ORDER BY LEAST("SenderID", "ReceiverID"), GREATEST("SenderID", "ReceiverID"), "Timestamp" DESC
+      `;
+
+      return latestMessages;
+    }
   );
