@@ -3,6 +3,7 @@ import { swagger } from "@elysiajs/swagger";
 import { swipeController } from "./controllers/swipeController";
 import { userController } from "./controllers/userController";
 import { skillController } from "./controllers/skillController";
+import { messageController } from "./controllers/messageController";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
@@ -10,6 +11,7 @@ const app = new Elysia()
   .use(swipeController)
   .use(userController)
   .use(skillController)
+  .use(messageController)
   .listen(3000);
 
 console.log(

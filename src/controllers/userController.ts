@@ -124,6 +124,25 @@ export const userController = new Elysia({ prefix: "/user" })
   }
   )
 
+  // Get all users
+  .get(
+    "/all",
+    async () => {
+      // Fetch all users
+      const users = await prisma.user.findMany({
+        include: {
+          UserSkills: {
+            include: {
+              Skill: true,
+            },
+          },
+          Notifications: true,
+        },
+      });
+
+      return users; // Return all users with related skills and notifications
+    })
+
   // Delete user profile
   .delete(
     "/:userID",
