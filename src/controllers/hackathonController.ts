@@ -27,7 +27,7 @@ export const hackathonController = new Elysia({ prefix: "/hackathon" })
         },
         {
         params: t.Object({
-            id: t.String(),
+            id: t.Number(),
         }),
         }
     )
@@ -35,17 +35,19 @@ export const hackathonController = new Elysia({ prefix: "/hackathon" })
     // Create a new hackathon
     .post(
         "/create",
-        async ({ body: { name, description }, error }) => {
+        async ({ body: { name, description, location, startDate, endDate }, error }) => {
         // Validate the input
-        if (!name || !description) {
+        if (!name || !description || !location || !startDate || !endDate) {
             return error(400, "Name and description are required");
         }
     
-        // Create the hackathon
         const newHackathon = await prisma.hackathon.create({
             data: {
             Name: name,
             Description: description,
+            StartDate: startDate,
+            EndDate: endDate,
+            Location: location, 
             },
         });
     
@@ -55,20 +57,22 @@ export const hackathonController = new Elysia({ prefix: "/hackathon" })
         body: t.Object({
             name: t.String(),
             description: t.String(),
+            location: t.String(),
+            startDate: t.String(),
+            endDate: t.String(),
         }),
         }
     )
-    
-    // Update an existing hackathon
+
+    // Update a hackathon
     .put(
         "/update",
-        async ({ body: { id, name, description }, error }) => {
+        async ({ body: { id, name, description, location, startDate, endDate }, error }) => {
         // Validate the input
-        if (!id || !name || !description) {
+        if (!id || !name || !description || !location || !startDate || !endDate) {
             return error(400, "ID, name, and description are required");
         }
     
-        // Update the hackathon
         const updatedHackathon = await prisma.hackathon.update({
             where: {
             HackathonID: id,
@@ -76,6 +80,9 @@ export const hackathonController = new Elysia({ prefix: "/hackathon" })
             data: {
             Name: name,
             Description: description,
+            StartDate: startDate,
+            EndDate: endDate,
+            Location: location,
             },
         });
     
@@ -83,13 +90,16 @@ export const hackathonController = new Elysia({ prefix: "/hackathon" })
         },
         {
         body: t.Object({
-            id: t.String(),
+            id: t.Number(),
             name: t.String(),
             description: t.String(),
+            location: t.String(),
+            startDate: t.String(),
+            endDate: t.String(),
         }),
         }
     )
-    
+
     // Delete a hackathon
     .delete(
         "/delete",
@@ -99,4 +109,17 @@ export const hackathonController = new Elysia({ prefix: "/hackathon" })
             return error(400, "ID is required");
         }
     
-        // Delete the hackathon
+        const deletedHackathon = await prisma.hackathon.delete({
+            where: {
+            HackathonID: id,
+            },
+        });
+    
+        return deletedHackathon;
+        },
+        {
+        body: t.Object({
+            id: t.Number(),
+        }),
+        }
+    );
