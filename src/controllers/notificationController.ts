@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
 import { prisma } from "../prisma"; // Prisma client
 
-export const notificationController = new Elysia({ prefix: "/notify" })
+export const notificationController = new Elysia({ prefix: "/noti" })
 
 .get("/:userID", async ({ params, error }) => {
     const { userID } = params;
