@@ -4,11 +4,13 @@ import { swipeController } from "./controllers/swipeController";
 import { userController } from "./controllers/userController";
 import { skillController } from "./controllers/skillController";
 import { messageController } from "./controllers/messageController";
+import { notificationController } from "./controllers/notificationController";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
   .use(swagger())
   .use(swipeController)
+  .use(notificationController)
   .use(userController)
   .use(skillController)
   .use(messageController)
