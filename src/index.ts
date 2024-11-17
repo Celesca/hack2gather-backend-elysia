@@ -5,6 +5,7 @@ import { userController } from "./controllers/userController";
 import { skillController } from "./controllers/skillController";
 import { messageController } from "./controllers/messageController";
 import { notificationController } from "./controllers/notificationController";
+import { hackathonController } from "./controllers/hackathonController";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
@@ -14,6 +15,7 @@ const app = new Elysia()
   .use(userController)
   .use(skillController)
   .use(messageController)
+  .use(hackathonController)
   .listen(3000);
 
 console.log(
