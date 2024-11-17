@@ -27,6 +27,9 @@ model User {
   SwipesReceived Swipe[]   @relation("SwipesReceived")
   Notifications Notification[]
   UserSkills    UserSkills[] // Relation to UserSkills (many-to-many with Skills)
+  Teams         Team[]     @relation("TeamMembers") // One user can be part of multiple teams
+  CreatedAt     DateTime   @default(now())
+  UpdatedAt     DateTime   @updatedAt
 }
 
 model Message {
@@ -82,6 +85,16 @@ model Hackathon {
   EndDate       DateTime
   Location      String
   Teams         Team[]   // One Hackathon can have multiple teams
+  CreatedAt     DateTime @default(now())
+  UpdatedAt     DateTime @updatedAt
+}
+
+model Team {
+  TeamID        Int      @id @default(autoincrement())
+  TeamName      String
+  HackathonID   Int
+  Hackathon     Hackathon @relation(fields: [HackathonID], references: [HackathonID])
+  Members       User[]    @relation("TeamMembers") // One team can have multiple users
   CreatedAt     DateTime @default(now())
   UpdatedAt     DateTime @updatedAt
 }
