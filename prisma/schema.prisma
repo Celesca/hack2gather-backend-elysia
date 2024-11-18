@@ -21,12 +21,16 @@ model User {
   WorkingStyle  String?
   ProfileImage  String?
   Bio           String?
+  CreatedAt     DateTime   @default(now())
+  UpdatedAt     DateTime   @updatedAt @default(now())
   MessagesSent  Message[]  @relation("MessagesSent")
   MessagesReceived Message[] @relation("MessagesReceived")
   SwipesMade    Swipe[]    @relation("SwipesMade")
   SwipesReceived Swipe[]   @relation("SwipesReceived")
   Notifications Notification[]
   UserSkills    UserSkills[] // Relation to UserSkills (many-to-many with Skills)
+  Teams         Team[]     @relation("TeamMembers") // One user can be part of multiple teams
+
 }
 
 model Message {
@@ -72,4 +76,26 @@ model UserSkills {
   Skill        Skills     @relation(fields: [Skill_ID], references: [Skill_ID], onDelete: Cascade)
   Skill_ID     Int
   // Add more fields if you need, like skill level or proficiency
+}
+
+model Hackathon {
+  HackathonID   Int      @id @default(autoincrement())
+  Name          String
+  Description   String
+  StartDate     DateTime
+  EndDate       DateTime
+  Location      String
+  Teams         Team[]   // One Hackathon can have multiple teams
+  CreatedAt     DateTime @default(now())
+  UpdatedAt     DateTime @updatedAt
+}
+
+model Team {
+  TeamID        Int      @id @default(autoincrement())
+  TeamName      String
+  HackathonID   Int
+  Hackathon     Hackathon @relation(fields: [HackathonID], references: [HackathonID])
+  Members       User[]    @relation("TeamMembers") // One team can have multiple users
+  CreatedAt     DateTime @default(now())
+  UpdatedAt     DateTime @updatedAt
 }
