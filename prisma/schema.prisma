@@ -21,6 +21,8 @@ model User {
   WorkingStyle  String?
   ProfileImage  String?
   Bio           String?
+  CreatedAt     DateTime   @default(now())
+  UpdatedAt     DateTime   @updatedAt @default(now())
   MessagesSent  Message[]  @relation("MessagesSent")
   MessagesReceived Message[] @relation("MessagesReceived")
   SwipesMade    Swipe[]    @relation("SwipesMade")
@@ -28,8 +30,7 @@ model User {
   Notifications Notification[]
   UserSkills    UserSkills[] // Relation to UserSkills (many-to-many with Skills)
   Teams         Team[]     @relation("TeamMembers") // One user can be part of multiple teams
-  CreatedAt     DateTime   @default(now())
-  UpdatedAt     DateTime   @updatedAt @default(now())
+
 }
 
 model Message {
