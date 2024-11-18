@@ -14,97 +14,97 @@ datasource db {
 }
 
 model User {
-  UserID        String       @id @default(uuid()) // Primary Key
-  UserName      String
-  Email         String       @unique
-  Password      String
-  WorkingStyle  String?
-  ProfileImage  String?
-  Bio           String?
-  CreatedAt     DateTime     @default(now())
-  UpdatedAt     DateTime     @updatedAt @default(now())
-  MessagesSent  Message[]    @relation("MessagesSent")
-  MessagesReceived Message[] @relation("MessagesReceived")
-  SwipesMade    Swipe[]      @relation("SwipesMade")
-  SwipesReceived Swipe[]     @relation("SwipesReceived")
-  Notifications Notification[]
-  UserSkills    UserSkills[] // Relation to UserSkills (many-to-many with Skills)
-  UserTeams     UserTeam[]   // Relation to UserTeam (many-to-many with Teams)
+  UserID           String         @id @default(uuid()) // Primary Key
+  UserName         String
+  Email            String         @unique
+  Password         String
+  WorkingStyle     String?
+  ProfileImage     String?
+  Bio              String?
+  CreatedAt        DateTime       @default(now())
+  UpdatedAt        DateTime       @default(now()) @updatedAt
+  MessagesSent     Message[]      @relation("MessagesSent")
+  MessagesReceived Message[]      @relation("MessagesReceived")
+  SwipesMade       Swipe[]        @relation("SwipesMade")
+  SwipesReceived   Swipe[]        @relation("SwipesReceived")
+  Notifications    Notification[]
+  UserSkills       UserSkills[] // Relation to UserSkills (many-to-many with Skills)
+  UserTeams        UserTeam[] // Relation to UserTeam (many-to-many with Teams)
 }
 
 model Message {
-  MessageID      Int       @id @default(autoincrement()) // Primary Key
-  Sender         User      @relation("MessagesSent", fields: [SenderID], references: [UserID])
+  MessageID      Int      @id @default(autoincrement()) // Primary Key
+  Sender         User     @relation("MessagesSent", fields: [SenderID], references: [UserID])
   SenderID       String
-  Receiver       User      @relation("MessagesReceived", fields: [ReceiverID], references: [UserID])
+  Receiver       User     @relation("MessagesReceived", fields: [ReceiverID], references: [UserID])
   ReceiverID     String
   MessageContent String
-  Timestamp      DateTime  @default(now())
-  ReadStatus     Boolean   @default(false)
+  Timestamp      DateTime @default(now())
+  ReadStatus     Boolean  @default(false)
 }
 
 model Swipe {
-  SwipeID        Int       @id @default(autoincrement()) // Primary Key
-  SwipingUser    User      @relation("SwipesMade", fields: [SwipingUserID], references: [UserID])
-  SwipingUserID  String
-  SwipedUser     User      @relation("SwipesReceived", fields: [SwipedUserID], references: [UserID])
-  SwipedUserID   String
-  SwipeAction    String    // "Like" or "Dislike"
-  Timestamp      DateTime  @default(now())
+  SwipeID       Int      @id @default(autoincrement()) // Primary Key
+  SwipingUser   User     @relation("SwipesMade", fields: [SwipingUserID], references: [UserID])
+  SwipingUserID String
+  SwipedUser    User     @relation("SwipesReceived", fields: [SwipedUserID], references: [UserID])
+  SwipedUserID  String
+  SwipeAction   String // "Like" or "Dislike"
+  Timestamp     DateTime @default(now())
 }
 
 model Notification {
-  NotificationID  Int      @id @default(autoincrement()) // Primary Key
-  User            User     @relation(fields: [UserID], references: [UserID])
-  UserID          String
+  NotificationID      Int      @id @default(autoincrement()) // Primary Key
+  User                User     @relation(fields: [UserID], references: [UserID])
+  UserID              String
   NotificationContent String
-  Timestamp       DateTime @default(now())
-  ReadStatus      Boolean  @default(false)
+  Timestamp           DateTime @default(now())
+  ReadStatus          Boolean  @default(false)
 }
 
 model Skills {
-  Skill_ID        Int        @id @default(autoincrement()) // Primary Key
-  Skill_Name      String     @unique // Unique skill name
-  UserSkills      UserSkills[] // Relation to UserSkills
+  Skill_ID   Int          @id @default(autoincrement()) // Primary Key
+  Skill_Name String       @unique // Unique skill name
+  UserSkills UserSkills[] // Relation to UserSkills
 }
 
 model UserSkills {
-  UserSkill_ID    Int        @id @default(autoincrement()) // Primary Key
-  User            User       @relation(fields: [UserID], references: [UserID])
-  UserID          String
-  Skill           Skills     @relation(fields: [Skill_ID], references: [Skill_ID], onDelete: Cascade)
-  Skill_ID        Int
+  UserSkill_ID Int    @id @default(autoincrement()) // Primary Key
+  User         User   @relation(fields: [UserID], references: [UserID])
+  UserID       String
+  Skill        Skills @relation(fields: [Skill_ID], references: [Skill_ID], onDelete: Cascade)
+  Skill_ID     Int
   // Add more fields if you need, like skill level or proficiency
 }
 
 model Hackathon {
-  HackathonID     Int      @id @default(autoincrement())
-  Name            String
-  Description     String
-  StartDate       DateTime
-  EndDate         DateTime
-  Location        String
-  Teams           Team[]   // One Hackathon can have multiple teams
-  CreatedAt       DateTime @default(now())
-  UpdatedAt       DateTime @updatedAt
+  HackathonID Int      @id @default(autoincrement())
+  Name        String
+  Description String
+  StartDate   DateTime
+  EndDate     DateTime
+  Location    String
+  Teams       Team[] // One Hackathon can have multiple teams
+  CreatedAt   DateTime @default(now())
+  UpdatedAt   DateTime @updatedAt
 }
 
 model Team {
-  TeamID          Int      @id @default(autoincrement())
-  TeamName        String
-  HackathonID     Int
-  Hackathon       Hackathon @relation(fields: [HackathonID], references: [HackathonID])
-  UserTeams       UserTeam[] // Relation to UserTeam (many-to-many with Users)
-  CreatedAt       DateTime @default(now())
-  UpdatedAt       DateTime @updatedAt
+  TeamID      Int        @id @default(autoincrement())
+  TeamName    String
+  HackathonID Int
+  Hackathon   Hackathon  @relation(fields: [HackathonID], references: [HackathonID])
+  UserTeams   UserTeam[] // Relation to UserTeam (many-to-many with Users)
+  CreatedAt   DateTime   @default(now())
+  UpdatedAt   DateTime   @updatedAt
 }
 
 model UserTeam {
-  UserTeamID      Int      @id @default(autoincrement()) // Primary Key
-  User            User     @relation(fields: [UserID], references: [UserID])
-  UserID          String
-  Team            Team     @relation(fields: [TeamID], references: [TeamID])
-  TeamID          Int
-  Role            String   // Role of the user in the team (e.g., Member, Leader)
-  JoinedAt        DateTime @default(now())
+  UserTeamID Int      @id @default(autoincrement()) // Primary Key
+  User       User     @relation(fields: [UserID], references: [UserID])
+  UserID     String
+  Team       Team     @relation(fields: [TeamID], references: [TeamID])
+  TeamID     Int
+  Role       String // Role of the user in the team (e.g., Member, Leader)
+  JoinedAt   DateTime @default(now())
 }
