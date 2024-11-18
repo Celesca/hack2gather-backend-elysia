@@ -8,3 +8,22 @@ export const teamController = new Elysia({ prefix: "/team" })
     return teams;
 })
 
+.get("/hackathon/:id", async ({ params: { id }, error }) => {
+    const teams = await prisma.team.findMany({
+        where: {
+            HackathonID: id,
+        },
+    });
+
+    if (!teams) {
+        return error(404, "Teams not found");
+    }
+
+    return teams;
+},
+{
+    params: t.Object({
+        id: t.Number(),
+    }),
+}
+)
