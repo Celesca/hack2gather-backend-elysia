@@ -10,10 +10,13 @@ services:
     working_dir: /app
     volumes:
       - .:/app
+    environment:
+      DATABASE_URL: mysql://root:root@db:3306/hack_db
     ports:
       - '3000:3000'
     networks:
       - my_network
+
 
   db:
     image: mysql:5.7
