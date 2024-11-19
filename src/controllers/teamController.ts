@@ -27,3 +27,6 @@ export const teamController = new Elysia({ prefix: "/team" })
     }),
 }
 )
+
+.post("/create", async ({ body, error }) => {
+    const { TeamName, HackathonID, TeamMembers 

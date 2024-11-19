@@ -78,6 +78,21 @@ export const swipeController = new Elysia({ prefix: "/swipe" })
                 NotificationContent: `You have a new match with ${userID}!`,
               },
             ],
+          })
+
+          await prisma.message.createMany({
+            data: [
+              {
+                SenderID: userID,
+                ReceiverID: swipedUserID,
+                MessageContent: "Matched!!",
+              },
+              {
+                SenderID: swipedUserID,
+                ReceiverID: userID,
+                MessageContent: "Matched!!",
+              },
+            ],
           });
 
           return {
