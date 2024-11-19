@@ -1,6 +1,20 @@
 version: '3.7'
 
 services:
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend_elysia
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - '3000:3000'
+    networks:
+      - my_network
+
   db:
     image: mysql:5.7
     container_name: hackathon_db
@@ -35,6 +49,4 @@ networks:
 
 volumes:
   mysql_data:
-    driver: local
-  sonarqube_db_data:
     driver: local
