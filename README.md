@@ -25,6 +25,17 @@ Sync the prisma schema with the MySQL
 
 Open http://localhost:3000/ with your browser to see the result.
 
+
+Deploy : 
+
+bun build \
+	--compile \
+	--minify-whitespace \
+	--minify-syntax \
+	--target bun \
+	--outfile server \
+	./src/index.ts
+
 Backlogs for the Swipe Feature :
 
 Swipe Page API Design:
