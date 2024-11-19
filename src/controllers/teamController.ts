@@ -45,3 +45,21 @@ export const teamController = new Elysia({ prefix: "/team" })
         hackathonID: t.Number(),
     }),
 })
+
+.put("/update", async ({ body, error }) => {
+    const { teamID, teamName } = body;
+
+    const team = await prisma.team.update({
+        where: { TeamID: teamID },
+        data: {
+            TeamName: teamName,
+        },
+    });
+
+    return team;
+}, {
+    body: t.Object({
+        teamID: t.Number(),
+        teamName: t.String(),
+    }),
+})
