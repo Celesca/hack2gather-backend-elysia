@@ -29,4 +29,19 @@ export const teamController = new Elysia({ prefix: "/team" })
 )
 
 .post("/create", async ({ body, error }) => {
-    const { TeamName, HackathonID, TeamMembers 
+    const { teamName, hackathonID } = body;
+
+    await prisma.team.create({
+        data: {
+            TeamName: teamName,
+            HackathonID: hackathonID,
+        },
+    });
+
+
+}, {
+    body: t.Object({
+        teamName: t.String(),
+        hackathonID: t.Number(),
+    }),
+})
