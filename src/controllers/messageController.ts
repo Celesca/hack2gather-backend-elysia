@@ -9,7 +9,6 @@ export const messageController = new Elysia({ prefix: "/message" })
     async ({ body, error }) => {
       const { senderID, receiverID, messageContent } = body;
 
-
       // Check if both users exist
       const sender = await prisma.user.findUnique({
         where: { UserID: senderID },
@@ -44,58 +43,53 @@ export const messageController = new Elysia({ prefix: "/message" })
   )
 
   // Get all messages between two users
-  .get(
-    "/:senderID/:receiverID",
-    async ({ params, error }) => {
-      const { senderID, receiverID } = params;
+  .get("/:senderID/:receiverID", async ({ params, error }) => {
+    const { senderID, receiverID } = params;
 
-      // Check if both users exist
-      const sender = await prisma.user.findUnique({
-        where: { UserID: senderID },
-      });
+    // Check if both users exist
+    const sender = await prisma.user.findUnique({
+      where: { UserID: senderID },
+    });
 
-      const receiver = await prisma.user.findUnique({
-        where: { UserID: receiverID },
-      });
+    const receiver = await prisma.user.findUnique({
+      where: { UserID: receiverID },
+    });
 
-      if (!sender || !receiver) {
-        return error(404, "Sender or receiver not found");
-      }
-
-      // Get all messages between the two users
-      const messages = await prisma.message.findMany({
-        where: {
-          OR: [
-            { SenderID: senderID, ReceiverID: receiverID },
-            { SenderID: receiverID, ReceiverID: senderID },
-          ],
-        },
-        orderBy: {
-          Timestamp: 'asc',
-        },
-      });
-
-      return messages;
+    if (!sender || !receiver) {
+      return error(404, "Sender or receiver not found");
     }
-  )
+
+    // Get all messages between the two users
+    const messages = await prisma.message.findMany({
+      where: {
+        OR: [
+          { SenderID: senderID, ReceiverID: receiverID },
+          { SenderID: receiverID, ReceiverID: senderID },
+        ],
+      },
+      orderBy: {
+        Timestamp: "asc",
+      },
+    });
+
+    return messages;
+  })
 
   // Query the message from each users that users contact with
-  .get(
-    "/inbox/:userID",
-    async ({ params, error }) => {
-      const { userID } = params;
+  .get("/inbox/:userID", async ({ params, error }) => {
+    const { userID } = params;
 
-      // Check if the user exists
-      const user = await prisma.user.findUnique({
-        where: { UserID: userID },
-      });
+    // Check if the user exists
+    const user = await prisma.user.findUnique({
+      where: { UserID: userID },
+    });
 
-      if (!user) {
-        return error(404, "User not found");
-      }
+    if (!user) {
+      return error(404, "User not found");
+    }
 
-      // Get the latest message from each conversation
-      const latestMessages = await prisma.$queryRaw`
+    // Get the latest message from each conversation
+    const latestMessages = await prisma.$queryRaw`
         SELECT DISTINCT ON (LEAST("SenderID", "ReceiverID"), GREATEST("SenderID", "ReceiverID"))
           "MessageID", "SenderID", "ReceiverID", "MessageContent", "Timestamp"
         FROM "Message"
@@ -103,6 +97,34 @@ export const messageController = new Elysia({ prefix: "/message" })
         ORDER BY LEAST("SenderID", "ReceiverID"), GREATEST("SenderID", "ReceiverID"), "Timestamp" DESC
       `;
 
-      return latestMessages;
+    return latestMessages;
+  })
+
+  // Delete a message
+  .delete(
+    "/delete/:messageID",
+    async ({ params, error }) => {
+      const { messageID } = params;
+
+      // Check if the message exists
+      const message = await prisma.message.findUnique({
+        where: { MessageID: parseInt(messageID) },
+      });
+
+      if (!message) {
+        return error(404, "Message not found");
+      }
+
+      // Delete the message
+      await prisma.message.delete({
+        where: { MessageID: parseInt(messageID) },
+      });
+
+      return { message: "Message deleted successfully" };
+    },
+    {
+      params: t.Object({
+        messageID: t.String(),
+      }),
     }
   );
