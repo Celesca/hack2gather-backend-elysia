@@ -63,3 +63,17 @@ export const teamController = new Elysia({ prefix: "/team" })
         teamName: t.String(),
     }),
 })
+
+.delete("/delete", async ({ body, error }) => {
+    const { teamID } = body;
+
+    const team = await prisma.team.delete({
+        where: { TeamID: teamID },
+    });
+
+    return team;
+}, {
+    body: t.Object({
+        teamID: t.Number(),
+    }),
+})
