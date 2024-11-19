@@ -79,3 +79,29 @@ export const notificationController = new Elysia({ prefix: "/noti" })
         ReadStatus: t.Boolean(),
     }),
 })
+
+// Delete a notification
+.delete("/:notificationID", async ({ params, error }) => {
+    const { notificationID } = params;
+    
+    // Check if notification exists
+    const notification = await prisma.notification.findUnique({
+        where: { NotificationID: notificationID },
+    });
+    
+    if (!notification) {
+        return error(404, "Notification not found");
+    }
+    
+    // Delete the notification
+    await prisma.notification.delete({
+        where: { NotificationID: notificationID },
+    });
+    
+    return { message: "Notification deleted successfully" };
+},
+{
+    params: t.Object({
+        notificationID: t.Number(),
+    }),
+})
