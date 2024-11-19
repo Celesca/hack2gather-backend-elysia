@@ -1,8 +1,9 @@
-# Hack2gather with Elysia
+# HACKA with Elysia
 
-Hack2gather is the application for hackathon finder 
+Hacka is the application for hackathon finder 
 
-![Screenshot 2024-11-08 003259](https://github.com/user-attachments/assets/75e3467e-c547-406a-a69c-ecd77b3e54e7)
+![image](https://github.com/user-attachments/assets/d5dfe7b4-2efe-44a4-8795-2c10f94d6259)
+
 
 ```bash
 bun create elysia ./elysia-example
