@@ -27,11 +27,11 @@ export const userController = new Elysia({ prefix: "/user" })
         data: {
           UserID: userID,
           UserName: userName,
+          Bio: bio,
           Email: email,
           Password: hashPassword,
-          WorkingStyle: workingStyle,
           ProfileImage: profileImage,
-          Bio: bio,
+          WorkingStyle: workingStyle,
         },
       });
 
