@@ -46,8 +46,7 @@ export const userController = new Elysia({ prefix: "/user" })
         profileImage: t.Optional(t.String()),
         bio: t.Optional(t.String()),
       }),
-        }
-      )
+        })
 
   // Get user details by userID
   .get(

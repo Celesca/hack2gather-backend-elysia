@@ -1,6 +1,7 @@
 // import { FaUser, FaLock } from "react-icons/fa";
 // import { MdEmail } from "react-icons/md";
 // import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2'
 import Axios from 'axios'
 import {useState} from 'react'
 import imagelogin from './assets/imagelogin.png';
@@ -53,6 +54,17 @@ const Register = () => {
           workingStyle: "",
           bio: "",
         });
+
+        Swal.fire({
+          title: "Good job!",
+          text: "Register Sucessful!",
+          icon: "success"
+        });
+        setTimeout(() => {
+          Swal.close();
+        }, 3000);
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
         localStorage.setItem('userID', JSON.stringify(response.data.UserID));
         window.location.href = '/Eventdetail';
