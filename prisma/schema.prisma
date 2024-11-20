@@ -81,8 +81,8 @@ model Hackathon {
   HackathonID Int      @id @default(autoincrement())
   Name        String
   Description String
-  StartDate   DateTime
-  EndDate     DateTime
+  StartDate   String
+  EndDate     String
   Location    String
   Teams       Team[] // One Hackathon can have multiple teams
   CreatedAt   DateTime @default(now())

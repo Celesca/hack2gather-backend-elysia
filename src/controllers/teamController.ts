@@ -31,12 +31,31 @@ export const teamController = new Elysia({ prefix: "/team" })
 .post("/create", async ({ body, error }) => {
     const { teamName, hackathonID } = body;
 
-    await prisma.team.create({
+    // Check if team and hackathonID exists
+    const hackathon = await prisma.hackathon.findUnique({
+        where: { HackathonID: hackathonID },
+    });
+
+    if (!hackathon) {
+        return error(404, "Hackathon not found");
+    }
+
+    const team = await prisma.team.findFirst({
+        where: { TeamName: teamName, HackathonID: hackathonID },
+    });
+
+    if (team) {
+        return error(400, "Team already exists");
+    }
+
+    const response = await prisma.team.create({
         data: {
             TeamName: teamName,
             HackathonID: hackathonID,
         },
     });
+
+    return response;
 
 
 }, {

@@ -6,6 +6,7 @@ import { skillController } from "./controllers/skillController";
 import { messageController } from "./controllers/messageController";
 import { notificationController } from "./controllers/notificationController";
 import { hackathonController } from "./controllers/hackathonController";
+import { teamController } from "./controllers/teamController";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
@@ -16,6 +17,7 @@ const app = new Elysia()
   .use(skillController)
   .use(messageController)
   .use(hackathonController)
+  .use(teamController)
   .listen(3000)
   .listen(process.env.PORT ?? 3000);
 
