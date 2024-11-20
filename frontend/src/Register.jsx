@@ -40,7 +40,24 @@ const Register = () => {
         bio: formData.bio,
       });
       setMessage("User registered successfully!");
-      console.log(response.data);
+
+      if (response.data) {
+
+        console.log(response.data)
+        setMessage("User registered successfully!");
+        setFormData({
+          userName: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          workingStyle: "",
+          bio: "",
+        });
+
+        localStorage.setItem('userID', JSON.stringify(response.data.UserID));
+        window.location.href = '/Eventdetail';
+
+      }
     } catch (error) {
       setMessage(error.response?.data || "Error registering user");
     }
