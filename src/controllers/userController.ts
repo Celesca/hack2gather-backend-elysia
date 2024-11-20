@@ -48,6 +48,41 @@ export const userController = new Elysia({ prefix: "/user" })
       }),
         })
 
+  
+  // User login
+.post(
+  "/login",
+  async ({ body, error }) => {
+    const { email, password } = body;
+
+    // Check if the user exists
+    const user = await prisma.user.findUnique({
+      where: { Email: email },
+    });
+
+    if (!user) {
+      return error(404, "User not found");
+    }
+
+    // Verify the password
+    const isPasswordValid = await Bun.password.verify(password, user.Password);
+
+    if (!isPasswordValid) {
+      return error(401, "Invalid credentials");
+    }
+
+    // Return user details or a token
+    return { message: "Login successful", user };
+  },
+  {
+    body: t.Object({
+      email: t.String(),
+      password: t.String(),
+    }),
+  }
+)
+
+
   // Get user details by userID
   .get(
     "/:userID",

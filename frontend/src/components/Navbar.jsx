@@ -1,9 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Menu, X, Bell } from 'lucide-react';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const user = localStorage.getItem('userID'); // or use a context/global state
+    if (user) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('userID');
+    setIsLoggedIn(false);
+  };
 
   return (
     <nav className="bg-gradient-to-r from-purple-700 to-blue-700 p-4 shadow-lg fixed w-full z-50">
@@ -40,10 +53,18 @@ function Navbar() {
             <a href="/register" className="text-white hover:text-purple-200 transition duration-300 font-medium">
               สมัครสมาชิก
             </a>
-            <a href="/login" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-              เข้าสู่ระบบ
-            </a>
-            <a href="/profile" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+            
+            {/* Conditionally render Login/Logout */}
+            {!isLoggedIn ? (
+              <>
+                <a href="/login" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                  เข้าสู่ระบบ
+                </a>
+              </>
+            ) : (
+              <>
+
+          <a href="/profile" className="text-white hover:text-purple-200 transition duration-300 font-medium">
               โปรไฟล์
             </a>
             <a href="/EventDetail" className="text-white hover:text-purple-200 transition duration-300 font-medium">
@@ -58,6 +79,17 @@ function Navbar() {
             <a href="/swipe" className="text-white hover:text-purple-200 transition duration-300 font-medium">
               จับคู่
             </a>
+
+                <button
+                  onClick={handleLogout}
+                  className="text-white hover:text-purple-200 transition duration-300 font-medium"
+                >
+                  ออกจากระบบ
+                </button>
+              </>
+            )}
+            
+            
             {/* Notification Bell */}
             <button className="p-2 hover:bg-white/10 rounded-full transition duration-300">
               <Bell className="h-6 w-6 text-white" />
@@ -97,18 +129,31 @@ function Navbar() {
               <a href="/register" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
                 สมัครสมาชิก
               </a>
-              <a href="/login" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-                เข้าสู่ระบบ
-              </a>
-              <a href="/profile" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+              {!isLoggedIn ? (
+                <a href="/login" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                  เข้าสู่ระบบ
+                </a>
+              ) : (
+                <>
+                
+                <a href="/profile" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
                 โปรไฟล์
               </a>
               <a href="/EventDetail" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-              กิจกกรรม hackathon
+                กิจกกรรม hackathon
               </a>
               <a href="/swipe" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
                 จับคู่
-              </a>
+              </a>                <button
+                  onClick={handleLogout}
+                  className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300"
+                >
+                  ออกจากระบบ
+                </button>
+
+                </>
+              )}
+              
             </div>
           </div>
         )}

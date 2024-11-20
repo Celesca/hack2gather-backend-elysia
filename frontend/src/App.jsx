@@ -33,7 +33,7 @@ function App() {
           />
            <Link to="/register">
         <button className="bg-yellow-200 text-blue-900 font-bold py-2 px-8 mt-6 rounded shadow-md">
-          Sign Up
+            Join Us
         </button>
       </Link>
         </main>

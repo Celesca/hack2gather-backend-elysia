@@ -28,8 +28,13 @@ const Register = () => {
 
 
     if (formData.password !== formData.confirmPassword) {
-      setMessage("Passwords do not match!");
+      Swal.fire({ 
+        title: "Error!",
+        text: "Passwords do not match!",
+        icon: "error",
+      });
       return;
+  
     }
     
     try {
@@ -67,11 +72,16 @@ const Register = () => {
         await new Promise(resolve => setTimeout(resolve, 2000));
 
         localStorage.setItem('userID', JSON.stringify(response.data.UserID));
-        window.location.href = '/Eventdetail';
+        window.location.href = '/login';
 
       }
     } catch (error) {
-      setMessage(error.response?.data || "Error registering user");
+      Swal.fire({
+        title: "Error!",
+        text: error.response?.data || "Error registering user",
+        icon: "error",
+      });
+  
     }
   };
   
@@ -147,6 +157,9 @@ const Register = () => {
             Register
           </button>
           {message && <p className="text-center mt-4">{message}</p>}
+
+
+
         </form>
       </div>
     </div>
