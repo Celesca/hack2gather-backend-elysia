@@ -6,7 +6,7 @@ export const userController = new Elysia({ prefix: "/user" })
   // Create a new user (sign-up)
   .post(
     "/create",
-    async ({ body, error }) => {
+    async ({ body, error, set }) => {
       const { userName, email, password, workingStyle, profileImage, bio } = body;
 
       const existingUser = await prisma.user.findUnique({
@@ -35,7 +35,11 @@ export const userController = new Elysia({ prefix: "/user" })
         },
       });
 
-      return newUser; // Return the newly created user
+      // return newUser and status 201
+      set.status = 201;
+      return newUser;
+
+
         },
         {
       body: t.Object({
