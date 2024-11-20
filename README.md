@@ -36,6 +36,13 @@ bun build \
 	--outfile server \
 	./src/index.ts
 
+Problems with the deployment :
+
+1. Azure MySQL Database Flexible Servers doesn't work for Free Subscription plan in MLSA account.
+2. Prisma need to change to debian-1.x.x to deploy the bun with the docker
+3. 
+
+
 Backlogs for the Swipe Feature :
 
 Swipe Page API Design:
