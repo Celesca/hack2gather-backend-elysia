@@ -8,6 +8,27 @@ export const teamController = new Elysia({ prefix: "/team" })
     return teams;
 })
 
+// Get TeamID from name and hackathon
+.get("/find", async ({ query: { teamName, hackathonID }, error }) => {
+    const team = await prisma.team.findFirst({
+        where: {
+            TeamName: teamName,
+            HackathonID: hackathonID,
+        },
+    });
+
+    if (!team) {
+        return error(404, "Team not found");
+    }
+
+    return team;
+}, {
+    query: t.Object({
+        teamName: t.String(),
+        hackathonID: t.Number(),
+    }),
+})
+
 .get("/hackathon/:id", async ({ params: { id }, error }) => {
     const teams = await prisma.team.findMany({
         where: {
@@ -94,5 +115,49 @@ export const teamController = new Elysia({ prefix: "/team" })
 }, {
     body: t.Object({
         teamID: t.Number(),
+    }),
+})
+
+.post("/addMember", async ({ body, error }) => {
+    const { teamID, userID, role } = body;
+
+    const team = await prisma.team.findUnique({
+        where: { TeamID: teamID },
+    });
+
+    if (!team) {
+        return error(404, "Team not found");
+    }
+
+    const user = await prisma.user.findUnique({
+        where: { UserID: userID },
+    });
+
+    if (!user) {
+        return error(404, "User not found");
+    }
+
+    const member = await prisma.userTeam.findFirst({
+        where: { TeamID: teamID, UserID: userID },
+    });
+
+    if (member) {
+        return error(400, "User is already a member of the team");
+    }
+
+    const response = await prisma.userTeam.create({
+        data: {
+            TeamID: teamID,
+            UserID: userID,
+            Role: role,
+        },
+    });
+
+    return response;
+}, {
+    body: t.Object({
+        teamID: t.Number(),
+        userID: t.String(),
+        role: t.String(),
     }),
 })
