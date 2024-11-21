@@ -19,6 +19,9 @@ const LoginForm = () => {
     try {
       const response = await Axios.post('http://localhost:3000/user/login', formData);
 
+      console.log(response.data);
+
+
       Swal.fire({
         title: "Good job!",
         text: "Login Sucessful!",
@@ -28,11 +31,11 @@ const LoginForm = () => {
         Swal.close();
       }, 3000);
 
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 750));
 
       // Save token to localStorage and redirect
       // localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('userID', response.data.UserID);
+      localStorage.setItem('UserID', JSON.stringify(response.data.UserID));
       window.location.href = '/profile';
     } catch (error) {
       Swal.fire({

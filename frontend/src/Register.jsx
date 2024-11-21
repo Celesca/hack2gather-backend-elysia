@@ -10,7 +10,7 @@ const Register = () => {
     userName:'',
     email:'',
     password:'',
-    confirmPassword:'',
+    ProfileImage:'',
     workingStyle:'',
     bio:'',
   });
@@ -27,21 +27,22 @@ const Register = () => {
     e.preventDefault();
 
 
-    if (formData.password !== formData.confirmPassword) {
-      Swal.fire({ 
-        title: "Error!",
-        text: "Passwords do not match!",
-        icon: "error",
-      });
-      return;
+    // if (formData.password !== formData.confirmPassword) {
+    //   Swal.fire({ 
+    //     title: "Error!",
+    //     text: "Passwords do not match!",
+    //     icon: "error",
+    //   });
+    //   return;
   
-    }
+    // }
     
     try {
       const response = await Axios.post('http://localhost:3000/user/create', {
         userName: formData.userName,
         email: formData.email,
         password: formData.password,
+        ProfileImage: formData.ProfileImage,
         workingStyle: formData.workingStyle,
         bio: formData.bio,
       });
@@ -55,7 +56,7 @@ const Register = () => {
           userName: "",
           email: "",
           password: "",
-          confirmPassword: "",
+          ProfileImage: "",
           workingStyle: "",
           bio: "",
         });
@@ -71,10 +72,11 @@ const Register = () => {
 
         await new Promise(resolve => setTimeout(resolve, 2000));
 
-        localStorage.setItem('userID', JSON.stringify(response.data.UserID));
+        // localStorage.setItem('UserID', JSON.stringify(response.data.UserID));
         window.location.href = '/login';
 
       }
+
     } catch (error) {
       Swal.fire({
         title: "Error!",
@@ -114,14 +116,7 @@ const Register = () => {
               required
               className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
             />
-            <input
-              name="workingStyle"
-              type="text"
-              placeholder="Working Style"
-              value={formData.workingStyle}
-              onChange={handleInputChange}
-              className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
-            />
+
             <textarea
               name="bio"
               placeholder="Short Description"
@@ -129,7 +124,9 @@ const Register = () => {
               onChange={handleInputChange}
               className="w-full h-32 px-4 py-2 bg-transparent border border-white rounded-lg text-white placeholder-white focus:outline-none focus:border-white resize-none"
             />
-            <input
+
+
+          <input
               name="password"
               type="password"
               placeholder="Password"
@@ -138,21 +135,34 @@ const Register = () => {
               required
               className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
             />
+
+         
             <input
-              name="confirmPassword"
-              type="password"
-              placeholder="Confirm Password"
-              value={formData.confirmPassword}
+              name="ProfileImage"
+              type="file"  // Changed to file input
               onChange={handleInputChange}
               required
               className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
             />
+
+<input
+              name="workingStyle"
+              type="text"
+              placeholder="Working Style"
+              value={formData.workingStyle}
+              onChange={handleInputChange}
+              className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
+            />
+           
+           
+         
+
           </div>
 
           {/* Submit button */}
           <button
             type="submit"
-            className="w-full h-12 bg-white text-black font-bold rounded-full shadow-md hover:bg-gray-200 transition duration-300"
+            className="mt-10 w-full h-12 bg-white text-black font-bold rounded-full shadow-md hover:bg-gray-200 transition duration-300"
           >
             Register
           </button>
