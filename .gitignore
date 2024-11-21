@@ -42,3 +42,7 @@ package-lock.json
 **/*.bun
 
 server.exe
+
+# Frontend folder
+frontend/node_modules
+frontend
