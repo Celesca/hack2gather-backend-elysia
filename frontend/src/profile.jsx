@@ -2,8 +2,18 @@ import  { useState } from 'react';
 import { FaUser, FaLock  } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import Axios from 'axios';
+import { useEffect} from 'react';
 
 const Profile = () => {
+  /*ข้อมูล User*/
+  const [UserID] = useState('');
+  const [UserName, setUserName] = useState('');
+  const [Bio, setBio] = useState('');
+  const [Email, setEmail] = useState('');
+  const [Password, setPassword] = useState('');
+  const [ProfileImage, setProfileImage] = useState('');
+  const [WorkingStyle, setWorkingStyle] = useState(0);
+  /*ไว้ Add ข้อมูล Skill*/
   const [company, setCompany] = useState('');
   const [description, setDescription] = useState('');
   const [endDate, setEnddate] = useState('');
@@ -15,13 +25,6 @@ const Profile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [school, setSchool] = useState('');
-  const [degree, setDegree] = useState(0);
-  const [password, setPassword] = useState('');
-
   const [userlist, setUserlist] = useState([]);
 
 
@@ -31,9 +34,27 @@ const Profile = () => {
   //   });
   // };
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (UserID) { // ตรวจสอบว่ามีค่า UserID ก่อนเรียก API
+        try {
+          const response = await Axios.get(`/api/getUserById?userId=${UserID}`);
+          const { UserName, Bio, ProfileImage } = response.data;
+          setUserName(UserName);
+          setBio(Bio);
+          setProfileImage(ProfileImage);
+        } catch (error) {
+          console.error('Error fetching user:', error);
+        }
+      }
+    };
+  
+    fetchUser();
+  }, [UserID]);
+  
 
   const addSkill = () => {
-    Axios.post('http://localhost:3000/profile', {
+    Axios.post('http://localhost:5173/profile', {
       company: company,
       description: description,
       endDate: endDate,
@@ -65,25 +86,23 @@ const Profile = () => {
 
   
   const addUsers = () => {
-    Axios.post('http://localhost:3000/profile', {
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      school: school,
-      degree: degree,
-      description: description,
-      password: password,
+    Axios.post('http://localhost:5173/profile', {
+      UserName: UserName,
+      Bio: Bio,
+      email: Email,
+      password: Password,
+      ProfileImage: ProfileImage,
+      WorkingStyle: WorkingStyle,
     }).then(() => {
       setUserlist([
         ...userlist,
         {
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          school: school,
-          degree: degree,
-          description: description,
-          password: password,
+          UserName: UserName,
+          Bio: Bio,
+          email: Email,
+          password: Password,
+          ProfileImage: ProfileImage,
+          WorkingStyle: WorkingStyle,
         },
       ]);
     });
@@ -94,7 +113,7 @@ const Profile = () => {
         <div className="p-6 space-y-10 bg-white rounded-lg shadow-md max-w-full max-h-screen">
           {/* Profile Header Section */}
           <div className="flex items-start gap-6">
-            {/* Profile Image */}
+              {ProfileImage}
             <div className="border-2 border-blue-400 p-1 rounded-lg">
               <div className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center">
                 <svg
@@ -117,7 +136,8 @@ const Profile = () => {
             <div className="flex-1">
               <div className="flex items-start justify-between">
                 <div>
-                  <h1 className="text-2xl font-semibold">Nameeee Surnameeeeeee</h1>
+                  <h1 className="text-2xl font-semibold">{UserName}</h1>
+      
                   <div className="flex items-center mt-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <svg
@@ -150,20 +170,10 @@ const Profile = () => {
                               <div className="relative">
                                 <input 
                                   type="text" 
-                                  placeholder="First Name" 
+                                  placeholder="User Name" 
                                   required 
                                   className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
-                                  onChange={(event) => setFirstName(event.target.value)}
-                                />
-                                <FaUser className="absolute right-4 top-3 text-white" />
-                              </div>
-                              <div className="relative">
-                                <input 
-                                  type="text" 
-                                  placeholder="Last Name" 
-                                  required 
-                                  className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
-                                  onChange={(event) => setLastName(event.target.value)}
+                                  onChange={(event) => setUserName(event.target.value)}
                                 />
                                 <FaUser className="absolute right-4 top-3 text-white" />
                               </div>
@@ -179,33 +189,34 @@ const Profile = () => {
                               </div>
                               <div className="relative">
                                 <input 
-                                  type="text" 
-                                  placeholder="School" 
+                                  type="file" 
+                                  placeholder="Image" 
                                   required 
                                   className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
-                                  onChange={(event) => setSchool(event.target.value)}
+                                  onChange={(event) => setProfileImage(event.target.files[0])}
                                 />
                                 <FaUser className="absolute right-4 top-3 text-white" />
                               </div>
                               <div className="relative">
                                 <input 
-                                  type="number" 
-                                  placeholder="Degree" 
+                                  type="text" 
+                                  placeholder="Working Style" 
                                   required 
                                   className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
-                                  onChange={(event) => setDegree(event.target.value)}
+                                  onChange={(event) => setWorkingStyle(Number(event.target.value))}
                                 />
                                 <FaUser className="absolute right-4 top-3 text-white" />
                               </div>
-                  
+
                               <div className="relative col-span-2">
                                 <textarea 
-                                  placeholder="Short Description" 
+                                  placeholder="Bio" 
                                   required 
                                   className="w-full h-32 px-4 py-2 bg-transparent border border-white rounded-lg text-white placeholder-white focus:outline-none focus:border-white resize-none"
-                                  onChange={(event) => setDescription(event.target.value)}
+                                  onChange={(event) => setBio(event.target.value)}
                                 />
                               </div>
+
                             </div>
                   
                             <div className="relative mt-6 mb-6">
@@ -232,8 +243,8 @@ const Profile = () => {
                                     >
                                         Cancel
                                     </button>
-                                </div>
-                  
+                                
+                            </div>
                           </form>
                         </div>
                       </div>
@@ -339,19 +350,14 @@ const Profile = () => {
               <div className="mt-4">
                 <h2 className="font-medium">แนะนำตัว</h2>
                 <p className="mt-2 text-gray-600 text-sm max-w-screen-lg">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                  enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                  nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                  in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                  nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                  sunt in culpa qui officia deserunt mollit anim id est laborum.
+                  {Bio}
                 </p>
               </div>
             </div>
           </div>
   
           {/* Past Events Section */}
+
           <div className="mt-8">
             <div className="flex items-center rounded-lg p-4 shadow-sm justify-between">
               <h2 className="text-lg font-medium">Past Event</h2>
