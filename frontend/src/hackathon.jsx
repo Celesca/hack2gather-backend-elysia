@@ -4,34 +4,25 @@ import { useEffect } from 'react';
 import  { useState } from 'react';
 
 const Hackathon = () => {
-  const [HackathonID] = useState([])
-  const [Name, setName] = useState('');
-  const [HackathonImage, setHackathonImage] = useState('');
+  const [Hackathonlist, setHackathonlist] = useState([]);
   
-  /*const getHackathon = () => {
-    Axios.get('http://localhost:3307/{hackathonID}').then((response) =>{
-      setHackathonlist(response.data)
-      
-    });
-  };*/
+  const getHackathon = async () => {
+    try {
+      const response = await Axios.get('http://localhost:3307/hackathon');
+      const data = response.data.map(hackathon => ({
+        Name: hackathon.Name,
+        HackathonImage: hackathon.HackathonImage
+      }));
+
+      setHackathonlist(data);
+    } catch (error) {
+      console.error('Error fetching Hackathon data:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchHackathon = async () => {
-      if (HackathonID) {  // ตรวจสอบว่า hackathonID มีค่า
-        try {
-            const response = await Axios.get(`/api/getUserById?userId=${HackathonID}`);
-            const { Name, HackathonImage } = response.data;
-            setName(Name);
-            setHackathonImage(HackathonImage);
-        } catch (error) {
-            console.error('Error fetching hackathon data:', error);
-        }
-      }
-    };
-
-    fetchHackathon();
-  }, [HackathonID]);
-
+    getHackathon();
+  }, []); 
 
   return (
     <div>
@@ -53,24 +44,19 @@ const Hackathon = () => {
           กิจกรรมแนะนำ
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {Hackathonlist.map((hackathon, index) => (
-              <div
-                key={HackathonID}
-                className="bg-gray-800 rounded shadow overflow-hidden"
-              >
-                <img
-                  src={`https://via.placeholder.com/300?text=${HackathonImage}`}
-                  alt={Name}
-                  className="w-full h-40 object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="text-lg font-bold text-white">
-                     {Name}
-                  </h3>
-                  <p className="text-sm text-gray-400">รายละเอียด...</p>
-                  <Link to="/Register" className="text-black hover:underline">
+          {Hackathonlist.map((hackathon) => (
+            <div key={hackathon.HackathonID} className="bg-gray-800 rounded shadow overflow-hidden">
+              <img
+                src={hackathon.HackathonImage}
+                alt={hackathon.Name}
+                className="w-full h-40 object-cover"
+              />
+              <div className="p-4">
+                <h3 className="text-lg font-bold text-white">{hackathon.Name}</h3>
+                  <p className="text-sm text-gray-400">รายละเอียด</p>
+                  <Link to={`/EventDetail/${hackathon.HackathonID}`}className="text-black hover:underline">
                     <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                    ดูรายละเอียด
+                      ดูรายละเอียด
                     </button>
                   </Link>
                 </div>
