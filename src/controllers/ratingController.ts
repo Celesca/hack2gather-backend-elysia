@@ -36,7 +36,7 @@ ratingController.post("/", async ({ body, error }) => {
     });
 
     return newRating;
-    
+
 }, {
     body: t.Object({
         ratedByID: t.String(),
@@ -44,4 +44,38 @@ ratingController.post("/", async ({ body, error }) => {
         ratingValue: t.Number(),
         comment: t.Optional(t.String()),
     }),
-});
+})
+
+// Update rating
+.put("/:ratingID", async ({ params, body, error }) => {
+    const { userRatingID } = params;
+    const { ratingValue, comment } = body;
+
+    // Check if the rating exists
+    const rating = await prisma.userRating.findUnique({
+        where: { UserRatingID: userRatingID },
+    });
+
+    if (!rating) {
+        return error(404, "Rating not found");
+    }
+
+    // Update the rating
+    const updatedRating = await prisma.userRating.update({
+        where: { UserRatingID: userRatingID },
+        data: {
+            RatingValue: ratingValue,
+            Comment: comment,
+        },
+    });
+
+    return updatedRating; // Return the updated rating
+}, {
+    params: t.Object({
+        userRatingID: t.Number(),
+    }),
+    body: t.Object({
+        ratingValue: t.Optional(t.Number()),
+        comment: t.Optional(t.String()),
+    }),
+})
