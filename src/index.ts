@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
+import { cors } from "@elysiajs/cors";
 import { swipeController } from "./controllers/swipeController";
 import { userController } from "./controllers/userController";
 import { skillController } from "./controllers/skillController";
@@ -22,6 +23,9 @@ const app = new Elysia()
   .use(messageController)
   .use(hackathonController)
   .use(teamController)
+  .use(cors({
+    origin: "*",
+  }))
   .listen(3000)
   .listen(process.env.PORT ?? 3000);
 

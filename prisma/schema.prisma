@@ -21,6 +21,7 @@ model User {
   WorkingStyle     String?
   ProfileImage     String?
   Bio              String?
+  AverageRating    Float?
   CreatedAt        DateTime       @default(now())
   UpdatedAt        DateTime       @default(now()) @updatedAt
   MessagesSent     Message[]      @relation("MessagesSent")
@@ -81,6 +82,7 @@ model Hackathon {
   HackathonID Int      @id @default(autoincrement())
   Name        String
   Description String
+  HackathonImage String?
   StartDate   String
   EndDate     String
   Location    String
