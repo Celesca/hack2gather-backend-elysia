@@ -1,7 +1,6 @@
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
-import { cors } from "@elysiajs/cors";
 import { swipeController } from "./controllers/swipeController";
 import { userController } from "./controllers/userController";
 import { skillController } from "./controllers/skillController";
@@ -9,6 +8,7 @@ import { messageController } from "./controllers/messageController";
 import { notificationController } from "./controllers/notificationController";
 import { hackathonController } from "./controllers/hackathonController";
 import { teamController } from "./controllers/teamController";
+import { ratingController } from "./controllers/ratingController";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
@@ -23,6 +23,7 @@ const app = new Elysia()
   .use(messageController)
   .use(hackathonController)
   .use(teamController)
+  .use(ratingController)
   .use(cors({
     origin: "*",
   }))
