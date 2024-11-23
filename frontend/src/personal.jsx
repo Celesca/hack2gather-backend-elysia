@@ -11,7 +11,7 @@ const Personal = () => {
     }).then(() => { 
       setUserlist([ 
         ...userlist, 
-        { personaltype: personaltype } 
+        { personaltype: personaltype }
       ]); 
     });
   }

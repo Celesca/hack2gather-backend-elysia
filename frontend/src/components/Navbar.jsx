@@ -7,14 +7,14 @@ function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem('userID'); // or use a context/global state
+    const user = localStorage.getItem('UserID'); // or use a context/global state
     if (user) {
       setIsLoggedIn(true);
     }
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('userID');
+    localStorage.removeItem('UserID');
     setIsLoggedIn(false);
     window.location.href = '/login';
   };

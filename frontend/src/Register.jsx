@@ -145,7 +145,7 @@ const Register = () => {
               className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
             />
 
-<input
+            <input
               name="workingStyle"
               type="text"
               placeholder="Working Style"
