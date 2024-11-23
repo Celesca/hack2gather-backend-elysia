@@ -35,6 +35,8 @@ ratingController.post("/", async ({ body, error }) => {
         },
     });
 
+    return newRating;
+    
 }, {
     body: t.Object({
         ratedByID: t.String(),
