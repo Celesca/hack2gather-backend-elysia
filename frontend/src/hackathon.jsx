@@ -8,7 +8,7 @@ const Hackathon = () => {
   
   const getHackathon = async () => {
     try {
-      const response = await Axios.get('http://localhost:3307/hackathon');
+      const response = await Axios.get('http://localhost:3000/hackathon');
       const data = response.data.map(hackathon => ({
         Name: hackathon.Name,
         HackathonImage: hackathon.HackathonImage
