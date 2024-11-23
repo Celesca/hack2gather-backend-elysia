@@ -1,13 +1,9 @@
 import './App.css';
-import { useEffect } from 'react';
 import homebg from './assets/homebg.jpg';
 import { TypeAnimation } from 'react-type-animation';
 import { Link } from 'react-router-dom';
 
 function App() {
-  useEffect(() => {
-    console.log('Hello World');
-  });
 
   return (
     <>
