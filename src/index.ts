@@ -1,7 +1,6 @@
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
-import { cors } from "@elysiajs/cors";
 import { swipeController } from "./controllers/swipeController";
 import { userController } from "./controllers/userController";
 import { skillController } from "./controllers/skillController";
