@@ -3,6 +3,31 @@ import { prisma } from "../prisma"; // Prisma client
 
 export const ratingController = new Elysia({ prefix: "/rating" })
 
+// Get all ratings for a user
+.get("/:ratedUserID", async ({ params, error }) => {
+    const { ratedUserID } = params;
+
+    // Check if the user exists
+    const user = await prisma.user.findUnique({
+        where: { UserID: ratedUserID },
+    });
+
+    if (!user) {
+        return error(404, "User not found");
+    }
+
+    // Get all ratings for the user
+    const ratings = await prisma.userRating.findMany({
+        where: { RatedUserID: ratedUserID },
+    });
+
+    return ratings;
+}, {
+    params: t.Object({
+        ratedUserID: t.String(),
+    }),
+})
+
 // Rating to someone
 ratingController.post("/", async ({ body, error }) => {
     const { ratedByID, ratedUserID, ratingValue, comment } = body;
@@ -47,7 +72,7 @@ ratingController.post("/", async ({ body, error }) => {
 })
 
 // Update rating
-.put("/:ratingID", async ({ params, body, error }) => {
+.put("/:userRatingID", async ({ params, body, error }) => {
     const { userRatingID } = params;
     const { ratingValue, comment } = body;
 
