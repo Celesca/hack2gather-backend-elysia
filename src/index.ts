@@ -9,6 +9,7 @@ import { notificationController } from "./controllers/notificationController";
 import { hackathonController } from "./controllers/hackathonController";
 import { teamController } from "./controllers/teamController";
 import { ratingController } from "./controllers/ratingController";
+import { personalController } from "./controllers/personalController";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
@@ -24,6 +25,7 @@ const app = new Elysia()
   .use(hackathonController)
   .use(teamController)
   .use(ratingController)
+  .use(personalController)
   .use(cors({
     origin: "*",
   }))
