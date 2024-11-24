@@ -1,4 +1,5 @@
 import { Elysia } from "elysia";
+import { cors } from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
 import { cors } from "@elysiajs/cors";
 import { swipeController } from "./controllers/swipeController";
@@ -12,6 +13,9 @@ import { teamController } from "./controllers/teamController";
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
   .use(swagger())
+  .use(cors({
+    origin: "*",
+  }))
   .use(swipeController)
   .use(notificationController)
   .use(userController)
