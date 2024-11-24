@@ -77,3 +77,43 @@ export const personalController = new Elysia({ prefix: "/personal" })
         personalID: t.Number(),
     }),
 })
+
+// Update personal information for a user
+.put("/update", async ({ body, error }) => {
+    const { userID, personalID } = body;
+
+    // Check if the user exists
+    const user = await prisma.user.findUnique({
+        where: { UserID: userID },
+    });
+
+    if (!user) {
+        return error(404, "User not found");
+    }
+
+    // Find the UserPersonal of the user
+    const personal = await prisma.userPersonal.findUnique({
+        where: { UserID: userID, PersonalID: personalID },
+    });
+
+    if (!personal) {
+        return error(404, "Personal information not found");
+    }
+
+    // Update the personal information
+    const updatedPersonal = await prisma.userPersonal.update({
+        where: { UserID: userID, PersonalID: personalID },
+        data: {
+            UserID: userID,
+            PersonalID: personalID,
+        },
+    });
+
+    return updatedPersonal;
+},
+{
+    body: t.Object({
+        userID: t.String(),
+        personalID: t.Number(),
+    }),
+})
