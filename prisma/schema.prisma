@@ -22,8 +22,8 @@ model User {
   ProfileImage     String?
   Bio              String?
   AverageRating    Float?         // Calculated from UserRating
-  PersonalType     PersonalType   @relation(fields: [PersonalTypeID], references: [PersonalTypeID])
-  PersonalTypeID   Int
+  PersonalType     PersonalType?  @relation(fields: [PersonalTypeID], references: [PersonalTypeID])
+  PersonalTypeID   Int?
   CreatedAt        DateTime       @default(now())
   UpdatedAt        DateTime       @default(now()) @updatedAt
   MessagesSent     Message[]      @relation("MessagesSent")
