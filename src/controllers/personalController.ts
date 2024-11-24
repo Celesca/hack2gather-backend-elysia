@@ -45,3 +45,21 @@ export const personalController = new Elysia({ prefix: "/personal" })
 })
 
 // Create the new personal type in the personal table.
+.post('/create', async ({ body, error }) => {
+    const { personalType, personalTypeDetail } = body;
+
+    // Create the new personal type
+    const newPersonalType = await prisma.personalType.create({
+        data: {
+            PersonalType: personalType,
+            PersonalTypeDetail: personalTypeDetail,
+        },
+    });
+
+    return newPersonalType;
+}, {
+    body: t.Object({
+        personalType: t.String(),
+        personalTypeDetail: t.String(),
+    }),
+})
