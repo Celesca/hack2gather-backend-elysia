@@ -18,9 +18,17 @@ const Register = () => {
   const [message, setMessage] = useState('');
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const { name, value, files } = e.target;
+  
+    if (name === "ProfileImage" && files) {
+      // Just store the file name (not the base64 string)
+      setFormData({ ...formData, ProfileImage: files[0].name });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
+  
+  
 
 
   const handleSubmit = async (e) => {
@@ -137,13 +145,14 @@ const Register = () => {
             />
 
          
-            <input
-              name="ProfileImage"
-              type="file"  // Changed to file input
-              onChange={handleInputChange}
-              required
-              className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
-            />
+          <input
+            name="ProfileImage"
+            type="file"
+            onChange={handleInputChange}
+            required
+            className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
+          />
+
 
             <input
               name="workingStyle"

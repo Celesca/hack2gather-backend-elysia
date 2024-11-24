@@ -51,13 +51,14 @@ function Navbar() {
             <a href="/" className="text-white hover:text-purple-200 transition duration-300 font-medium">
               หน้าแรก
             </a>
-            <a href="/register" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-              สมัครสมาชิก
-            </a>
+         
             
             {/* Conditionally render Login/Logout */}
             {!isLoggedIn ? (
               <>
+                 <a href="/register" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+              สมัครสมาชิก
+            </a>
                 <a href="/login" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                   เข้าสู่ระบบ
                 </a>

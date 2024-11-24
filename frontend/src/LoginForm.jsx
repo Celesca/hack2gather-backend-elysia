@@ -22,6 +22,11 @@ const LoginForm = () => {
       console.log(response.data);
 
 
+      const userID = response.data.UserID || response.data.user?.UserID;
+      if (!userID) throw new Error('UserID is missing in the response');
+
+
+
       Swal.fire({
         title: "Good job!",
         text: "Login Sucessful!",
@@ -35,7 +40,7 @@ const LoginForm = () => {
 
       // Save token to localStorage and redirect
       // localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('UserID', JSON.stringify(response.data.UserID));
+      localStorage.setItem('UserID', userID);
       window.location.href = '/profile';
     } catch (error) {
       Swal.fire({
