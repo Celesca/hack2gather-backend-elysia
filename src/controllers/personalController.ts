@@ -3,7 +3,7 @@ import { prisma } from "../prisma"; // Prisma client
 
 export const personalController = new Elysia({ prefix: "/personal" })
 
-// Get personal type for a user
+// Get PersonalType of the user
 .get("/:userID", async ({ params, error }) => {
     const { userID } = params;
 
@@ -16,104 +16,32 @@ export const personalController = new Elysia({ prefix: "/personal" })
         return error(404, "User not found");
     }
 
-    // Get all personal information for the user
-    const personal = await prisma.userPersonal.findMany({
+    // Get all personal information of the user
+    const personal = await prisma.user.findMany({
         where: { UserID: userID },
     });
 
-    return personal;
+    // Get the personalTypeID of the user
+    const personalTypeID = personal.length > 0 ? personal[0].PersonalTypeID : null;
+
+    if (!personalTypeID) {
+        return error(404, "Personal type not found");
+    }
+
+    // Get the personal type of the user
+    const personalType = await prisma.personalType.findUnique({
+        where: { PersonalTypeID: personalTypeID },
+    });
+
+    // Return the json of the userID and the personalType
+    return {
+        userID: userID,
+        personalType: personalType,
+    };
 }, {
     params: t.Object({
         userID: t.String(),
     }),
 })
 
-// Create new personal type in personal table
-.post("/create", async ({ body, error }) => {
-    const { personalID, personalType, personalTypeDetail } = body;
-
-    // Create the new personal information
-    const newPersonal = await prisma.personal.create({
-        data: {
-            PersonalID: personalID,
-            PersonalType: personalType,
-            PersonalTypeDetail: personalTypeDetail,
-
-        },
-    });
-}, {
-    body: t.Object({
-        personalID: t.Number(),
-        personalType: t.String(),
-        personalTypeDetail: t.String(),
-    }),
-})
-
-// Add personal information for a user
-.post("/addToUser", async ({ body, error }) => {
-    const { userID, personalID } = body;
-
-    // Check if the user exists
-    const user = await prisma.user.findUnique({
-        where: { UserID: userID },
-    });
-
-    if (!user) {
-        return error(404, "User not found");
-    }
-
-    // Create the new personal information
-    const newPersonal = await prisma.userPersonal.create({
-        data: {
-            UserID: userID,
-            PersonalID: personalID,
-        },
-    });
-
-    return newPersonal;
-}, {
-    body: t.Object({
-        userID: t.String(),
-        personalID: t.Number(),
-    }),
-})
-
-// Update personal information for a user
-.put("/update", async ({ body, error }) => {
-    const { userID, personalID } = body;
-
-    // Check if the user exists
-    const user = await prisma.user.findUnique({
-        where: { UserID: userID },
-    });
-
-    if (!user) {
-        return error(404, "User not found");
-    }
-
-    // Find the UserPersonal of the user
-    const personal = await prisma.userPersonal.findUnique({
-        where: { UserID: userID, PersonalID: personalID },
-    });
-
-    if (!personal) {
-        return error(404, "Personal information not found");
-    }
-
-    // Update the personal information
-    const updatedPersonal = await prisma.userPersonal.update({
-        where: { UserID: userID, PersonalID: personalID },
-        data: {
-            UserID: userID,
-            PersonalID: personalID,
-        },
-    });
-
-    return updatedPersonal;
-},
-{
-    body: t.Object({
-        userID: t.String(),
-        personalID: t.Number(),
-    }),
-})
+// Create the new personal type in the personal table.
