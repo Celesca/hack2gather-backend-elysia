@@ -21,17 +21,20 @@ function Navbar() {
   };
 
   const NotificationBell = () => {
-    const UserID = localStorage.getItem('UserID'); // Assuming UserID is stored in localStorage
-    const [notifications, setNotifications] = useState([]); // เก็บข้อมูล notifications
-    const [dropdownOpen, setDropdownOpen] = useState(false); // สำหรับควบคุมการเปิด/ปิด dropdown
+    const notificationID = localStorage.getItem('notificationID'); 
+    const UserID = localStorage.getItem('UserID');
+    const [notifications, setNotifications] = useState([]); 
+    const [dropdownOpen, setDropdownOpen] = useState(false); 
 
-    // Fetch notifications from API
+    console.log(UserID)
+    console.log(notificationID)
+    
     useEffect(() => {
       const fetchNotifications = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/notification/${UserID}`);
+          const response = await axios.get('http://localhost:3000/noti/${UserID}');
           const unreadNotifications = response.data.filter(
-            (notification) => notification.ReadStatus === 0
+            (notification) => notification.ReadStatus === false
           );
           setNotifications(unreadNotifications);
         } catch (error) {
@@ -40,12 +43,12 @@ function Navbar() {
       };
 
       fetchNotifications();
-    }, [UserID]); // เพิ่ม UserID ให้เป็น dependency ใน useEffect เพื่อให้แน่ใจว่าเรียกใหม่เมื่อมีการเปลี่ยนแปลง
+    }, [notificationID]); 
 
     // Mark a notification as read
     const markAsRead = async (NotificationID) => {
       try {
-        await axios.put(`http://localhost:3000/notifications/${NotificationID}`, { ReadStatus: 1 });
+        await axios.put('http://localhost:3000/noti/${UserID}/unread', { ReadStatus: true });
         setNotifications((prev) =>
           prev.filter((notification) => notification.NotificationID !== NotificationID)
         );
@@ -99,20 +102,20 @@ function Navbar() {
                 </>
               ) : (
                 <>
-                  <a href="/profile" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-                    โปรไฟล์
-                  </a>
-                  <a href="/EventDetail" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-                    กิจกกรรม hackathon
-                  </a>
                   <a href="/hackathon" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                     รวม hackathon
+                  </a>
+                  <a href="/EventDetail" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                    กิจกรรม hackathon
                   </a>
                   <a href="/Personal" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                     personal Type
                   </a>
                   <a href="/swipe" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                     จับคู่
+                  </a>
+                  <a href="/profile" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                    โปรไฟล์
                   </a>
 
                   <button
@@ -151,7 +154,7 @@ function Navbar() {
                             <span>{notification.NotificationContent}</span>
                             <button
                               className="text-gray-500 hover:text-gray-700"
-                              onClick={() => markAsRead(notification.NotificationID)} // เปลี่ยนสถานะเป็น Read เมื่อกด
+                              onClick={() => markAsRead(notification.NotificationID)} 
                             >
                               ✖
                             </button>
