@@ -29,25 +29,28 @@ export const personalController = new Elysia({ prefix: "/personal" })
 })
 
 // Create new personal type in personal table
-.post("/", async ({ body, error }) => {
-    const { personalType } = body;
+.post("/create", async ({ body, error }) => {
+    const { personalID, personalType, personalTypeDetail } = body;
 
-    // Create the new personal type
+    // Create the new personal information
     const newPersonal = await prisma.personal.create({
         data: {
+            PersonalID: personalID,
             PersonalType: personalType,
+            PersonalTypeDetail: personalTypeDetail,
+
         },
     });
-
-    return newPersonal;
 }, {
     body: t.Object({
+        personalID: t.Number(),
         personalType: t.String(),
+        personalTypeDetail: t.String(),
     }),
 })
 
 // Add personal information for a user
-.post("/", async ({ body, error }) => {
+.post("/addToUser", async ({ body, error }) => {
     const { userID, personalID } = body;
 
     // Check if the user exists

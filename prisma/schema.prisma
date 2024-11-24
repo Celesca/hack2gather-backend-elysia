@@ -127,8 +127,8 @@ model UserTeam {
 
 model Personal {
   PersonalID Int     @id
-  Personal_type String // Type of personal information (e.g., Address, Phone Number)
-  Personal_type_detail String // Specific details of the personal information
+  PersonalType String // Type of personal information (e.g., Address, Phone Number)
+  PersonalTypeDetail String // Specific details of the personal information
   UserPersonal UserPersonal[] // Relation to UserPersonal
 }
 
