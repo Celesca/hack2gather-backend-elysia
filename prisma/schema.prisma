@@ -22,6 +22,8 @@ model User {
   ProfileImage     String?
   Bio              String?
   AverageRating    Float?         // Calculated from UserRating
+  PersonalType     PersonalType   @relation(fields: [PersonalTypeID], references: [PersonalTypeID])
+  PersonalTypeID   Int
   CreatedAt        DateTime       @default(now())
   UpdatedAt        DateTime       @default(now()) @updatedAt
   MessagesSent     Message[]      @relation("MessagesSent")
@@ -33,7 +35,6 @@ model User {
   UserTeams        UserTeam[]     // Relation to UserTeam (many-to-many with Teams)
   RatingsGiven     UserRating[]   @relation("RatingsGiven") // Ratings this user has given
   RatingsReceived  UserRating[]   @relation("RatingsReceived") // Ratings this user has received
-  UserPersonal     UserPersonal[] // Relation to UserPersonal
 }
 
 model UserRating {
@@ -125,17 +126,9 @@ model UserTeam {
   JoinedAt   DateTime @default(now())
 }
 
-model Personal {
-  PersonalID Int     @id
-  PersonalType String // Type of personal information (e.g., Address, Phone Number)
-  PersonalTypeDetail String // Specific details of the personal information
-  UserPersonal UserPersonal[] // Relation to UserPersonal
-}
-
-model UserPersonal {
-  UserPersonalID Int      @id @default(autoincrement()) // Primary Key
-  User           User     @relation(fields: [UserID], references: [UserID])
-  UserID         String
-  Personal       Personal @relation(fields: [PersonalID], references: [PersonalID])
-  PersonalID     Int
+model PersonalType {
+  PersonalTypeID   Int       @id @default(autoincrement())
+  PersonalType     String
+  PersonalTypeDetail String
+  Users            User[]
 }
