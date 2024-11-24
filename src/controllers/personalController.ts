@@ -160,7 +160,9 @@ export const personalController = new Elysia({ prefix: "/personal" })
             PersonalTypeID: null,
         },
     });
-    
+
+    return updatedPersonal;
+
 }, {
     params: t.Object({
         userID: t.String(),

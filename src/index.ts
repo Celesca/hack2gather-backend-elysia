@@ -13,7 +13,7 @@ import { personalController } from "./controllers/personalController";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
-  .use(swagger())
+  .use(swagger({ path: '/v2/swagger' }))
   .use(cors({
     origin: "*",
   }))
