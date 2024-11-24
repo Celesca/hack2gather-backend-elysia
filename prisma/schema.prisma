@@ -138,6 +138,4 @@ model UserPersonal {
   UserID         String
   Personal       Personal @relation(fields: [PersonalID], references: [PersonalID])
   PersonalID     Int
-  CreatedAt      DateTime @default(now())
-  UpdatedAt      DateTime @default(now()) @updatedAt
 }
