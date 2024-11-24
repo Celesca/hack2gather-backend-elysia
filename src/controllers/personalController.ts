@@ -153,12 +153,14 @@ export const personalController = new Elysia({ prefix: "/personal" })
         return error(404, "User not found");
     }
 
-    // Delete the user
-    const deletedUser = await prisma.user.delete({
+    // Update the personalTypeID to null
+    const updatedPersonal = await prisma.user.update({
         where: { UserID: userID },
+        data: {
+            PersonalTypeID: null,
+        },
     });
-
-    return deletedUser;
+    
 }, {
     params: t.Object({
         userID: t.String(),
