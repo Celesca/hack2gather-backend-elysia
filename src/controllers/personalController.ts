@@ -27,3 +27,32 @@ export const personalController = new Elysia({ prefix: "/personal" })
         userID: t.String(),
     }),
 })
+
+// Add personal information for a user
+.post("/", async ({ body, error }) => {
+    const { userID, personalID } = body;
+
+    // Check if the user exists
+    const user = await prisma.user.findUnique({
+        where: { UserID: userID },
+    });
+
+    if (!user) {
+        return error(404, "User not found");
+    }
+
+    // Create the new personal information
+    const newPersonal = await prisma.userPersonal.create({
+        data: {
+            UserID: userID,
+            PersonalID: personalID,
+        },
+    });
+
+    return newPersonal;
+}, {
+    body: t.Object({
+        userID: t.String(),
+        personalID: t.Number(),
+    }),
+})
