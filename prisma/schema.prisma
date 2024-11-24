@@ -33,6 +33,7 @@ model User {
   UserTeams        UserTeam[]     // Relation to UserTeam (many-to-many with Teams)
   RatingsGiven     UserRating[]   @relation("RatingsGiven") // Ratings this user has given
   RatingsReceived  UserRating[]   @relation("RatingsReceived") // Ratings this user has received
+  UserPersonal     UserPersonal[] // Relation to UserPersonal
 }
 
 model UserRating {
@@ -122,4 +123,21 @@ model UserTeam {
   TeamID     Int
   Role       String // Role of the user in the team (e.g., Member, Leader)
   JoinedAt   DateTime @default(now())
+}
+
+model Personal {
+  PersonalID Int     @id @default(autoincrement())
+  Personal_type String // Type of personal information (e.g., Address, Phone Number)
+  Personal_type_detail String // Specific details of the personal information
+  UserPersonal UserPersonal[] // Relation to UserPersonal
+}
+
+model UserPersonal {
+  UserPersonalID Int      @id @default(autoincrement()) // Primary Key
+  User           User     @relation(fields: [UserID], references: [UserID])
+  UserID         String
+  Personal       Personal @relation(fields: [PersonalID], references: [PersonalID])
+  PersonalID     Int
+  CreatedAt      DateTime @default(now())
+  UpdatedAt      DateTime @default(now()) @updatedAt
 }
