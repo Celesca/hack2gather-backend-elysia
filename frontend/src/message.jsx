@@ -3,9 +3,18 @@ import ChatList from './components/ChatList';
 import ChatBox from './components/ChatBox';
 import axios from 'axios';
 
+// Schemas for Inbox
+// MessageID: int
+// SenderID: int
+// ReceiverID: int
+// MessageContent: string
+// otherUser: {
+// UserID: int, UserName, ProfileImage
+
 const Message = () => {
   const [activeChat, setActiveChat] = useState(null);
   const [userID, setUserID] = useState(null);
+  // const [chats, setChats] = useState([]);
 
   const contacts = [
     { id: 1, name: 'John Doe', message: 'Hey! How are you?' },
@@ -16,8 +25,8 @@ const Message = () => {
   const fetchChats = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/message/inbox/${userID}`);
-      console.log(response.data[0]);
-      setActiveChat(response.data[0]);
+      console.log(response.data);
+      // setChats(response.data);
     } catch (error) {
       console.error('Error fetching chats:', error);
     }
@@ -30,9 +39,9 @@ const Message = () => {
     }
   }, [])
 
-  fetchChats();
-
-
+  useEffect(() => {
+    fetchChats();
+  }, [userID]);
 
   const handleChatSelect = (contact) => {
     setActiveChat(contact);
