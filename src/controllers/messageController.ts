@@ -120,6 +120,21 @@ export const messageController = new Elysia({ prefix: "/message" })
           m1.Timestamp = m2.maxTimestamp
       `;
 
+      // get the total number of unread messages
+    for (let i = 0; i < latestMessages.length; i++) {
+      const message = latestMessages[i];
+      const unreadMessages = await prisma.message.count({
+        where: {
+          SenderID: message.SenderID === userID ? message.ReceiverID : message.SenderID,
+          ReceiverID: userID,
+          ReadStatus: false,
+        },
+      });
+
+      latestMessages[i].unreadMessages = unreadMessages;
+    }
+
+
     // get the user information of the other user in the conversation
     for (let i = 0; i < latestMessages.length; i++) {
       const message = latestMessages[i];
