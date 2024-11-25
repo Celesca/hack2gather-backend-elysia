@@ -110,9 +110,6 @@ export const userController = new Elysia({ prefix: "/user" })
   return user;
 })
 
-
-
-
   // Get user details by userID
   .get(
     "/:userID",
@@ -147,7 +144,7 @@ export const userController = new Elysia({ prefix: "/user" })
 .put(
   "/:userID",
   async ({ params: { userID }, body, error }) => {
-    const { userName, email, workingStyle, profileImage, bio } = body;
+    const { userName, email, workingStyle, profileImage, bio, age, location } = body;
 
     // Check if the user exists
     const user = await prisma.user.findUnique({
@@ -167,6 +164,8 @@ export const userController = new Elysia({ prefix: "/user" })
         WorkingStyle: workingStyle || user.WorkingStyle,
         ProfileImage: profileImage || user.ProfileImage,
         Bio: bio || user.Bio,
+        Age: age || user.Age,
+        Location: location || user.Location,
       },
     });
 
@@ -182,6 +181,8 @@ export const userController = new Elysia({ prefix: "/user" })
       workingStyle: t.Optional(t.String()),
       profileImage: t.Optional(t.String()),
       bio: t.Optional(t.String()),
+      age: t.Optional(t.Number()),
+      location: t.Optional(t.String()),
     }),
   }
 )
