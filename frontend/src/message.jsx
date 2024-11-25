@@ -33,7 +33,6 @@ const Message = () => {
         MessageContent: chat.MessageContent,
       }));
       setChats(chats);
-      // console.log(chats);
     } catch (error) {
       console.error("Error fetching chats:", error);
     }
@@ -44,9 +43,7 @@ const Message = () => {
       const response = await axios.get(
         `http://localhost:3000/message/${userID}/${receiverID}`
       );
-      // setMessages from the response.data
       setMessages(response.data);
-      console.log(activeUser);
     } catch (error) {
       console.error("Error fetching messages:", error);
     }

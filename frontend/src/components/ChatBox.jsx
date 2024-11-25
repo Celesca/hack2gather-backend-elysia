@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 
 const ChatBox = ({ activeUser, messages }) => {
 
-  console.log(activeUser);
   if (!activeUser) {
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-50">
@@ -12,26 +11,45 @@ const ChatBox = ({ activeUser, messages }) => {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50">
+    <div className="flex-1 flex flex-col bg-gray-50 pt-16">
       {/* Chat Header */}
       <div className="p-4 border-b bg-white">
-        <h2 className="text-lg font-bold">{activeUser.UserName}</h2>
+        <h2 className="text-lg font-bold text-black">{activeUser.UserName}</h2>
       </div>
 
       {/* Chat Messages */}
         <div className="flex-1 p-4 overflow-y-auto">
           <div className="flex flex-col">
             {messages.map((msg) => (
-          <div 
-            key={msg.MessageID} 
-            className={`p-2 mb-2 rounded-md w-fit max-w-xs ${
-              msg.SenderID === activeUser.UserID 
-            ? 'bg-gray-200 self-start' 
-            : 'bg-blue-100 self-end'
-            }`}
-          >
+              <div key={msg.MessageID} className="flex items-start mb-2">
+          {msg.SenderID === activeUser.UserID ? (
+            <>
+              <div className="flex-1 flex justify-start">
+                <img 
+            src={activeUser.ProfileImage} 
+            alt={activeUser.UserName} 
+            className="w-8 h-8 rounded-full mr-2"
+                />
+                <div className="p-2 rounded-md bg-gray-200 text-black max-w-xs">
             {msg.MessageContent}
-          </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex-1 flex justify-end">
+                <div className="p-2 rounded-md bg-blue-100 text-black max-w-xs">
+            {msg.MessageContent}
+                </div>
+                <img 
+            src={msg.SenderID.ProfileImage} 
+            alt={msg.SenderID.UserName} 
+            className="w-8 h-8 rounded-full ml-2"
+                />
+              </div>
+            </>
+          )}
+              </div>
             ))}
           </div>
         </div>
