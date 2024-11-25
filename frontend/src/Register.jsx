@@ -2,6 +2,8 @@ import Swal from 'sweetalert2'
 import Axios from 'axios'
 import {useState} from 'react'
 import imagelogin from './assets/imagelogin.png';
+import { Link } from 'react-router-dom';
+
 const Register = () => {
   const  [formData, setFormData] = useState( { 
     userName:'',
@@ -16,14 +18,17 @@ const Register = () => {
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-  
-    if (name === "ProfileImage" && files) {
-      // Just store the file name (not the base64 string)
-      setFormData({ ...formData, ProfileImage: files[0].name });
+    if (name === 'ProfileImage' && files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setFormData({ ...formData, ProfileImage: reader.result }); // Store base64 string
+      };
+      reader.readAsDataURL(files[0]);
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
+  
   
   
 
@@ -97,11 +102,11 @@ const Register = () => {
       className="flex items-center justify-center min-h-screen bg-cover bg-center"
       style={{ backgroundImage: `url(${imagelogin})` }}
     >
-      <div className="mt-20 w-full max-w-2xl bg-gradient-to-b from-bluebg to-skybg text-white rounded-lg p-5 shadow-lg">
+      <div className="mt-20 w-full max-w-2xl bg-gradient-to-b from-bluebg to-skybg text-white rounded-lg p-8 shadow-2xl transform transition duration-500 hover:scale-105">
         <form onSubmit={handleSubmit}>
-          <h1 className="text-4xl font-bold text-center mb-6">Register</h1>
+          <h1 className="text-4xl font-bold text-center mb-8">Register</h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Input fields */}
             <input
               name="userName"
@@ -110,7 +115,7 @@ const Register = () => {
               value={formData.userName}
               onChange={handleInputChange}
               required
-              className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
+              className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-black placeholder-white focus:outline-none focus:border-white transition duration-300 hover:bg-white hover:text-black"
             />
             <input
               name="email"
@@ -119,7 +124,7 @@ const Register = () => {
               value={formData.email}
               onChange={handleInputChange}
               required
-              className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
+              className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white transition duration-300 hover:bg-white hover:text-black"
             />
 
             <textarea
@@ -127,29 +132,27 @@ const Register = () => {
               placeholder="Short Description"
               value={formData.bio}
               onChange={handleInputChange}
-              className="w-full h-32 px-4 py-2 bg-transparent border border-white rounded-lg text-white placeholder-white focus:outline-none focus:border-white resize-none"
+              className="w-full h-32 px-4 py-2 bg-transparent border border-white rounded-lg text-white placeholder-white focus:outline-none focus:border-white resize-none transition duration-300 hover:bg-white hover:text-black"
             />
 
-
-          <input
+            <input
               name="password"
               type="password"
               placeholder="Password"
               value={formData.password}
               onChange={handleInputChange}
               required
-              className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
+              className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white transition duration-300 hover:bg-white hover:text-black"
             />
 
-         
-          <input
-            name="ProfileImage"
-            type="file"
-            onChange={handleInputChange}
-            required
-            className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
-          />
-
+            <input
+              name="ProfileImage"
+              type="file"
+              onChange={handleInputChange}
+              accept="image/*"
+              required
+              className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white transition duration-300 hover:bg-white hover:text-black"
+            />
 
             <input
               name="workingStyle"
@@ -157,25 +160,27 @@ const Register = () => {
               placeholder="Working Style"
               value={formData.workingStyle}
               onChange={handleInputChange}
-              className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
+              className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white transition duration-300 hover:bg-white hover:text-black"
             />
-           
-           
-         
-
           </div>
 
           {/* Submit button */}
           <button
             type="submit"
-            className="mt-10 w-full h-12 bg-white text-black font-bold rounded-full shadow-md hover:bg-gray-200 transition duration-300"
+            className="mt-10 w-full h-12 bg-white text-black font-bold rounded-full shadow-md hover:bg-gray-200 transition duration-300 transform hover:scale-105"
           >
             Register
           </button>
+
+          <div className="text-center mt-6">
+            <p className="text-white">
+              Already have an account?{' '}
+              <Link to="/login" className="text-black hover:underline">
+                Login
+              </Link>
+            </p>
+          </div>
           {message && <p className="text-center mt-4">{message}</p>}
-
-
-
         </form>
       </div>
     </div>

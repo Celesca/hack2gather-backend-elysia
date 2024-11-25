@@ -3,8 +3,10 @@ import { FaUser } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import Axios from 'axios';
 import PropTypes from 'prop-types';
+import Swal from 'sweetalert2'
 
 
+// EditProfileModal component
 // EditProfileModal component
 const EditProfileModal = ({ isOpen, onClose, onSave, user }) => {
   const [userName, setUserName] = useState(user?.UserName || '');
@@ -21,15 +23,30 @@ const EditProfileModal = ({ isOpen, onClose, onSave, user }) => {
     formData.append('workingStyle', workingStyle);
     formData.append('bio', bio);
 
-
     try {
-      const response = await Axios.put(`http:/localhost:3000/user/${user.UserID}`, formData, {
+      const response = await Axios.put(`http://localhost:3000/user/${user.UserID}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
       onSave(response.data);
-      console.log(response.data);
+
+
+      Swal.fire({
+        title: "Good job!",
+        text: "Register Sucessful!",
+        icon: "success"
+      });
+      setTimeout(() => {
+        Swal.close();
+      }, 3000);
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+
+      window.location.href = '/profile'
+
+
     } catch (error) {
       console.error('Error updating profile:', error);
     }
@@ -39,7 +56,7 @@ const EditProfileModal = ({ isOpen, onClose, onSave, user }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="w-full max-w-2xl bg-gradient-to-b from-bluebg to-skybg text-white rounded-lg p-5 shadow-lg">
+      <div className="w-full max-w-3xl bg-gradient-to-b from-bluebg to-skybg text-white rounded-lg p-8 shadow-lg">
         <form onSubmit={(e) => e.preventDefault()}>
           <h1 className="text-4xl font-bold text-center mb-6">Edit Profile</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -126,6 +143,7 @@ EditProfileModal.propTypes = {
     Bio: PropTypes.string,
   }),
 };
+
 
 
 // AddSkillModal component
@@ -259,7 +277,6 @@ const Profile = () => {
         const response = await Axios.get(`http://localhost:3000/user/id/${UserID}`);
         if (!response.data) throw new Error("User not found");
 
-        console.log(response.data);
 
         setUser(response.data);
       } catch (err) {
@@ -276,7 +293,7 @@ const Profile = () => {
     try {
       await Axios.put('http://localhost:3000/user/${UserID}', profileData);
       setIsEditProfileModalOpen(false);
-      const response = await Axios.get(`http://localhost:3000/user/${UserID}`);
+      const response = await Axios.get(`http://localhost:3000/user/id/${UserID}`);
       setUser(response.data);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -309,57 +326,11 @@ const Profile = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-sky-100 flex items-center justify-center p-4">
-      <div className="p-6 space-y-10 bg-white rounded-lg shadow-md max-w-full max-h-screen">
-        <div className="flex items-start gap-6">
-          <div className="border-2 border-blue-400 p-1 rounded-lg">
-            <div className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center">
-              {user.ProfileImage ? (
-                <img 
-                src={user.ProfileImage}
-                alt="Profile" 
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              ) : (
-                <FaUser className="w-16 h-16 text-gray-400" />
-              )}
-            </div>
-          </div>
-          <div className="flex-1">
-            <div className="flex items-start justify-between">
-              <div>
-                <h1 className="text-2xl font-semibold">{user.UserName || 'Anonymous User'}</h1>
-              </div>
-              <div className="flex flex-col gap-2">
-                <button 
-                  onClick={() => setIsEditProfileModalOpen(true)}
-                  className="px-4 py-2 bg-gray-200 rounded-lg text-sm"
-                >
-                  EDIT PROFILE
-                </button>
-                <button 
-                  onClick={() => setIsAddSkillModalOpen(true)}
-                  className="px-4 py-2 bg-gray-200 rounded-lg text-sm"
-                >
-                  ADD SKILL
-                </button>
-                <button 
-                  onClick={() => setIsAddPersonalTypeModalOpen(true)}
-                  className="px-4 py-2 bg-gray-200 rounded-lg text-sm"
-                >
-                  ADD PERSONAL TYPE
-                </button>
-              </div>
-            </div>
-            <div className="mt-4">
-              <h2 className="font-medium">Bio</h2>
-              <p className="mt-2 text-gray-600 text-sm max-w-screen-lg">
-                {user.Bio || 'No bio available'}
-              </p>
-            </div>
-          </div>
-        </div>
-        <EditProfileModal
+
+    
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-sky-100 flex items-center justify-center p-8">
+      
+      <EditProfileModal
           isOpen={isEditProfileModalOpen}
           onClose={() => setIsEditProfileModalOpen(false)}
           onSave={handleProfileUpdate}
@@ -375,8 +346,73 @@ const Profile = () => {
           onClose={() => setIsAddPersonalTypeModalOpen(false)}
           onSave={handlePersonalTypeSave}
         />
+      <div className="p-8 space-y-10 bg-white rounded-xl shadow-lg max-w-5xl w-full transform transition-transform duration-300 hover:scale-102 hover:shadow-2xl">
+        <div className="flex items-start gap-8">
+          <div className="border-4 border-blue-400 p-2 rounded-xl transform transition-all duration-300 hover:border-blue-500 hover:rotate-2">
+            <div className="w-40 h-40 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+              {user.ProfileImage ? (
+                <img 
+                  src={user.ProfileImage}
+                  alt="Profile" 
+                  className="w-full h-full object-cover rounded-lg transform transition-transform duration-300 hover:scale-110"
+                />
+              ) : (
+                <FaUser className="w-20 h-20 text-gray-400" />
+              )}
+            </div>
+          </div>
+
+          
+
+          <div className="flex-1">
+            <div className="flex items-start justify-between">
+              <div>
+                <h1 className="text-3xl font-bold">{user.UserName || 'Anonymous User'}</h1>
+                <div className="mt-4">
+                <h2 className="font-medium">แนะนำตัว</h2>
+                <p className="mt-2 text-gray-600 text-sm max-w-screen-lg">
+                  {user.Bio || 'No bio available'}
+                </p>
+              </div>
+              </div>
+              <div className="flex flex-col gap-3">
+                
+                <button 
+                  onClick={() => setIsEditProfileModalOpen(true)}
+                  className="px-6 py-2 bg-gray-200 rounded-lg text-sm font-medium transform transition-all duration-300 hover:bg-gray-300 hover:scale-105 hover:shadow-md"
+                >
+                  EDIT PROFILE
+                </button>
+                <button 
+                  onClick={() => setIsAddSkillModalOpen(true)}
+                  className="px-6 py-2 bg-gray-200 rounded-lg text-sm font-medium transform transition-all duration-300 hover:bg-gray-300 hover:scale-105 hover:shadow-md"
+                >
+                  ADD SKILL
+                </button>
+                <button 
+                  onClick={() => setIsAddPersonalTypeModalOpen(true)}
+                  className="px-6 py-2 bg-gray-200 rounded-lg text-sm font-medium transform transition-all duration-300 hover:bg-gray-300 hover:scale-105 hover:shadow-md"
+                >
+                  ADD PERSONAL TYPE
+                </button>
+              </div>
+            </div>
+            <div className="mt-6">
+              <h2 className="text-xl font-semibold">สไตล์การทำงาน</h2>
+              <p className="mt-3 text-gray-600 text-base leading-relaxed max-w-screen-lg">
+                {user.WorkingStyle || 'No bio available'}
+              </p>
+            </div>
+          </div>
+        </div>
+      
       </div>
     </div>
+    
+
+
+
+
   );
 };
 

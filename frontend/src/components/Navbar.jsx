@@ -49,7 +49,7 @@ function Navbar() {
           {/* Desktop Menu Items */}
           <div className="hidden md:flex items-center space-x-6">
             <a href="/" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-              หน้าแรก
+              Home
             </a>
          
             
@@ -57,36 +57,34 @@ function Navbar() {
             {!isLoggedIn ? (
               <>
                  <a href="/register" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-              สมัครสมาชิก
+              Register
             </a>
                 <a href="/login" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-                  เข้าสู่ระบบ
+                  Login 
                 </a>
               </>
             ) : (
               <>
 
           <a href="/profile" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-              โปรไฟล์
+              Profile
             </a>
             <a href="/EventDetail" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-              กิจกกรรม hackathon
+               Event hackathon
             </a>
             <a href="/hackathon" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-              รวม hackathon
+               hackathon
             </a>
-            <a href="/Personal" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-              personal Type
-            </a>
+          
             <a href="/swipe" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-              จับคู่
+              Match
             </a>
 
                 <button
                   onClick={handleLogout}
                   className="text-white hover:text-purple-200 transition duration-300 font-medium"
                 >
-                  ออกจากระบบ
+                  Logout
                 </button>
               </>
             )}
