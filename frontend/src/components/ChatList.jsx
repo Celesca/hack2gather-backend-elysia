@@ -34,6 +34,7 @@ ChatList.propTypes = {
       UserName: PropTypes.string.isRequired,
       ProfileImage: PropTypes.string.isRequired,
       MessageContent: PropTypes.string.isRequired,
+      UnreadMessages: PropTypes.number,
     })
   ).isRequired,
   onSelectChat: PropTypes.func.isRequired,

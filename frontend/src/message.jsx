@@ -32,6 +32,7 @@ const Message = () => {
         UserName: chat.otherUser.UserName,
         ProfileImage: chat.otherUser.ProfileImage,
         MessageContent: chat.MessageContent,
+        unreadMessages: chat.unreadMessages,
       }));
       setChats(chats);
     } catch (error) {
@@ -46,7 +47,7 @@ const Message = () => {
       );
       setMessages(response.data);
       // Mark messages as read
-      await axios.put(`http://localhost:3000/message/${userID}/${receiverID}`);
+      await axios.put(`http://localhost:3000/message/read/${userID}/${receiverID}`);
 
     } catch (error) {
       console.error("Error fetching messages:", error);
