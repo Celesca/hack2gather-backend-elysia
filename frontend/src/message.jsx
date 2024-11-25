@@ -27,6 +27,7 @@ const Message = () => {
       const response = await axios.get(
         `http://localhost:3000/message/inbox/${userID}`
       );
+      console.log(response.data);
       const chats = response.data.map((chat) => ({
         UserID: chat.otherUser.UserID,
         UserName: chat.otherUser.UserName,

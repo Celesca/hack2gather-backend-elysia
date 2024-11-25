@@ -16,10 +16,15 @@ const ChatList = ({ chats, onSelectChat }) => {
               alt={`${chat.UserName}'s profile`}
               className="w-10 h-10 rounded-full mr-4"
             />
-            <div>
+            <div className="flex-grow">
               <p className="font-semibold">{chat.UserName}</p>
               <p className="text-sm text-gray-500 truncate">{chat.MessageContent}</p>
             </div>
+            {chat.UnreadMessages > 0 && (
+              <span className="bg-blue-500 text-white rounded-full px-2 py-1 text-xs">
+                {chat.UnreadMessages}
+              </span>
+            )}
           </li>
         ))}
       </ul>
