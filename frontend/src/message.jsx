@@ -14,18 +14,25 @@ import axios from 'axios';
 const Message = () => {
   const [activeChat, setActiveChat] = useState(null);
   const [userID, setUserID] = useState(null);
-  // const [chats, setChats] = useState([]);
+  const [chats, setChats] = useState([]);
 
-  const contacts = [
-    { id: 1, name: 'John Doe', message: 'Hey! How are you?' },
-    { id: 2, name: 'Jane Smith', message: 'Let’s catch up soon!' },
-    { id: 3, name: 'Mark Taylor', message: 'Check this out.' },
-  ];
+  // Example of chats
+  // const chats = [
+  //   { UserID: 1, UserName: 'Alice', ProfileImage: '/profile1.jpg', }, ]
 
   const fetchChats = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/message/inbox/${userID}`);
       console.log(response.data);
+      const chats = response.data.map(chat => ({
+        UserID: chat.otherUser.UserID,
+        UserName: chat.otherUser.UserName,
+        ProfileImage: chat.otherUser.ProfileImage,
+        MessageContent: chat.MessageContent
+      }));
+      setChats(chats);
+
+      console.log(chats);
       // setChats(response.data);
     } catch (error) {
       console.error('Error fetching chats:', error);
@@ -51,7 +58,7 @@ const Message = () => {
     <div className="flex h-screen bg-gray-100">
       {activeChat ? (
         <div className="flex flex-1 pt-4">
-          <ChatList contacts={contacts} onSelectChat={handleChatSelect} />
+          <ChatList chats={chats} onSelectChat={handleChatSelect} />
           <ChatBox activeChat={activeChat} />
         </div>
       ) : (
