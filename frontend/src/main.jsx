@@ -69,7 +69,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />
   },
   {
-    path: "/EventDetail",
+    path: "/EventDetail/:HackathonID" ,
     element: (
       <>
         <Navbar />

@@ -1,11 +1,58 @@
+import Axios from 'axios';
 import  { useState } from 'react';
-
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { useCallback } from "react";
 const EventDetail = () => {
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
   const [teamName, setTeamName] = useState('');
-  const [StartDate, ] = useState('19/08/2025');
-  const [EndDate, ] = useState('19/19/2999');
-  const [Name, ] = useState('Hackathon 2025');
+  const { HackathonID } = useParams();
+  console.log("Route param HackathonID:", HackathonID);
+  const [Hackathondetaillist, setHackathondetaillist] = useState([]);
+
+const getHackathondetail = useCallback(async () => {
+  try {
+    const response = await Axios.get(`http://localhost:3000/hackathon/${HackathonID}`);
+    const filteredData = response.data.filter(hackathon => hackathon.HackathonID === HackathonID);
+    const data = filteredData.map(hackathon => ({
+      Name: hackathon.Name,
+      HackathonImage: hackathon.HackathonImage,
+      StartDate: hackathon.StartDate,
+      EndDate: hackathon.EndDate,
+      Location: hackathon.Location,
+      Description: hackathon.Description,
+    }));
+    setHackathondetaillist(data);
+  } catch (error) {
+    console.error('Error fetching Hackathon data:', error);
+  }
+}, [HackathonID]);
+
+useEffect(() => {
+  getHackathondetail();
+}, [getHackathondetail]);
+  // const getHackathondetail = async () => {
+  //   try {
+  //     const response = await Axios.get(`http://localhost:3000/hackathon/${HackathonID}`);
+  //     const filteredData = response.data.filter(hackathon => hackathon.HackathonID === HackathonID);
+  //     const data = filteredData.map(hackathon => ({
+  //       Name: hackathon.Name,
+  //       HackathonImage: hackathon.HackathonImage,
+  //       StartDate: hackathon.StartDate,
+  //       EndDate: hackathon.EndDate,
+  //       Location: hackathon.Location,
+  //       Description: hackathon.Description
+  //     }));
+
+  //     setHackathondetaillist(data);
+  //   } catch (error) {
+  //     console.error('Error fetching Hackathon data:', error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   getHackathondetail();
+
+  // }, [HackathonID]); 
   // const handleJoinTeam = (teamId) => {}
 
     return (
@@ -19,31 +66,35 @@ const EventDetail = () => {
               className="rounded-lg shadow-lg w-full object-cover"
             />
           </div>
-          
-          <div className="flex-1">
-            <h2 className="text-4xl font-bold mb-4">{Name}</h2>
+          {Hackathondetaillist.map((hackathon) => (
+          <div key={hackathon.HackathonID} className="bg-gray-800 rounded shadow overflow-hidden">
+            <div className="flex-1">
+              <h2 className="text-4xl font-bold mb-4">{hackathon.Name}</h2>
 
-            <div className="flex items-center gap-2"> 
+              <div className="flex items-center gap-2"> 
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                </svg>
+                <span className="text-lg font-semibold">Location {hackathon.Location}</span>
+              </div>
+
+              <div className="flex items-center gap-2 mt-3"> 
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 2.994v2.25m10.5-2.25v2.25m-14.252 13.5V7.491a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v11.251m-18 0a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5m-6.75-6h2.25m-9 2.25h4.5m.002-2.25h.005v.006H12v-.006Zm-.001 4.5h.006v.006h-.006v-.005Zm-2.25.001h.005v.006H9.75v-.006Zm-2.25 0h.005v.005h-.006v-.005Zm6.75-2.247h.005v.005h-.005v-.005Zm0 2.247h.006v.006h-.006v-.006Zm2.25-2.248h.006V15H16.5v-.005Z" />
               </svg>
-              <span className="text-lg font-semibold">Location</span>
-            </div>
+                <span className="text-lg font-semibold">{hackathon.StartDate} - {hackathon.EndDate}</span>
+              </div>
 
-            <div className="flex items-center gap-2 mt-3"> 
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 2.994v2.25m10.5-2.25v2.25m-14.252 13.5V7.491a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v11.251m-18 0a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5m-6.75-6h2.25m-9 2.25h4.5m.002-2.25h.005v.006H12v-.006Zm-.001 4.5h.006v.006h-.006v-.005Zm-2.25.001h.005v.006H9.75v-.006Zm-2.25 0h.005v.005h-.006v-.005Zm6.75-2.247h.005v.005h-.005v-.005Zm0 2.247h.006v.006h-.006v-.006Zm2.25-2.248h.006V15H16.5v-.005Z" />
-            </svg>
-              <span className="text-lg font-semibold">{StartDate} - {EndDate}</span>
+              {/* <div className="flex items-center space-x-4">
+                <p className="text-lg">ประเภทการแข่งขัน:</p>
+                <p className="font-semibold text-xl">👫 Team</p>
+              </div> */}
             </div>
-
-            {/* <div className="flex items-center space-x-4">
-              <p className="text-lg">ประเภทการแข่งขัน:</p>
-              <p className="font-semibold text-xl">👫 Team</p>
-            </div> */}
           </div>
+          ))}
         </div>
+            
   
         {/* Details Section */}
         <div className="px-8 py-16 lg:px-24 bg-gray-100">
