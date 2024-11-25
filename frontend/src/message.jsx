@@ -47,10 +47,11 @@ const Message = () => {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center w-full h-full">
+          <img src="/undraw_friends.svg" alt="Friends" className="w-1/5" />
           <p className="text-lg text-gray-700 mb-4">Try to make new friends by Matching Feature</p>
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded"
-            onClick={() => window.location.href = '/matching'}
+            onClick={() => window.location.href = '/swipe'}
           >
             Go to Matching Feature
           </button>
