@@ -45,6 +45,9 @@ const Message = () => {
         `http://localhost:3000/message/${userID}/${receiverID}`
       );
       setMessages(response.data);
+      // Mark messages as read
+      await axios.put(`http://localhost:3000/message/${userID}/${receiverID}`);
+      
     } catch (error) {
       console.error("Error fetching messages:", error);
     }

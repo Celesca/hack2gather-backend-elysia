@@ -164,25 +164,33 @@ export const messageController = new Elysia({ prefix: "/message" })
   )
 
 // Change to ReadStatus of a message
-.put("/read/:messageID", async ({ params, error }) => {
-  const { messageID } = params;
+.put("/read/:senderID/:receiverID", async ({ params, error }) => {
+  const { senderID, receiverID } = params;
 
-  // Check if the message exists
-  const message = await prisma.message.findUnique({
-    where: { MessageID: parseInt(messageID) },
+  // Check if both users exist
+  const sender = await prisma.user.findUnique({
+    where: { UserID: senderID },
   });
 
-  if (!message) {
-    return error(404, "Message not found");
+  const receiver = await prisma.user.findUnique({
+    where: { UserID: receiverID },
+  });
+
+  if (!sender || !receiver) {
+    return error(404, "Sender or receiver not found");
   }
 
-  // Update the message
-  const updatedMessage = await prisma.message.update({
-    where: { MessageID: parseInt(messageID) },
+  // Update the ReadStatus of the messages
+  await prisma.message.updateMany({
+    where: {
+      SenderID: receiverID,
+      ReceiverID: senderID,
+      ReadStatus: false,
+    },
     data: {
       ReadStatus: true,
     },
   });
 
-  return updatedMessage;
+  return { message: "Messages updated successfully" };
 });
