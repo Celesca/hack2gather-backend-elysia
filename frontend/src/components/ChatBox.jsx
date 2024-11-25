@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const ChatBox = ({ activeUser, messages, handleSendMessage }) => {
@@ -18,7 +18,11 @@ const ChatBox = ({ activeUser, messages, handleSendMessage }) => {
     }
   };
 
-  fetchProfileImage(UserID);
+  useEffect(() => {
+    if (UserID) {
+      fetchProfileImage(UserID);
+    }
+  }, [UserID]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

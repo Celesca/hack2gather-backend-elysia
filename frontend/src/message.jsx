@@ -20,59 +20,22 @@ const Message = () => {
   const [userID, setUserID] = useState(null);
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-    // First add this loading spinner component at the top of your file
-  const LoadingSpinner = () => (
-    <div className="flex justify-center items-center h-full">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-    </div>
-  );
   
 
   const fetchChats = async () => {
-    setIsLoading(true);
-    setError(null);
-    
     try {
-      // Configure axios with timeout and retry
-      const instance = axios.create({
-        timeout: 5000,
-        baseURL: 'http://localhost:3000'
-      });
-      
-      const response = await instance.get(`/message/inbox/${userID}`);
-      
-      if (!response.data) {
-        throw new Error('No data received from server');
-      }
-
+      const response = await axios.get(
+        `http://localhost:3000/message/inbox/${userID}`
+      );
       const chats = response.data.map((chat) => ({
-        UserID: chat.otherUser?.UserID,
-        UserName: chat.otherUser?.UserName,
-        ProfileImage: chat.otherUser?.ProfileImage || '/default-profile.jpg',
+        UserID: chat.otherUser.UserID,
+        UserName: chat.otherUser.UserName,
+        ProfileImage: chat.otherUser.ProfileImage,
         MessageContent: chat.MessageContent,
       }));
-      
       setChats(chats);
     } catch (error) {
-      let errorMessage = 'An error occurred while fetching chats';
-      
-      if (axios.isAxiosError(error)) {
-        if (error.code === 'ECONNABORTED') {
-          errorMessage = 'Request timed out';
-        } else if (error.response) {
-          errorMessage = `Server error: ${error.response.status}`;
-        } else if (error.request) {
-          errorMessage = 'No response from server';
-        }
-      }
-      
-      setError(errorMessage);
-      console.error("Error fetching chats:", errorMessage);
-    } finally {
-      setIsLoading(false);
+      console.error("Error fetching chats:", error);
     }
   };
 
@@ -94,7 +57,11 @@ const Message = () => {
     }
   }, []);
 
-  fetchChats();
+  useEffect(() => {
+    if (userID) {
+      fetchChats();
+    }
+  }, [userID]);
 
   const handleChatSelect = (receiverData) => {
     setActiveUser(receiverData);
@@ -114,7 +81,6 @@ const Message = () => {
   }};
 
   return (
-    
     <div className="flex h-screen bg-gray-100">
       {chats.length > 0 ? (
         <div className="flex flex-1 pt-4">
