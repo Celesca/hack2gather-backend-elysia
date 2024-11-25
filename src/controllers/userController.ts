@@ -7,7 +7,7 @@ export const userController = new Elysia({ prefix: "/user" })
   .post(
     "/create",
     async ({ body, error }) => {
-      const { userName, email, password, workingStyle, ProfileImage, bio } = body;
+      const { userName, email, password, workingStyle, ProfileImage, bio, age, location } = body;
 
       const existingUser = await prisma.user.findUnique({
         where: { Email: email },
@@ -32,6 +32,9 @@ export const userController = new Elysia({ prefix: "/user" })
           Password: hashPassword,
           ProfileImage: ProfileImage, // base64 string
           WorkingStyle: workingStyle,
+          Age: age,
+          Location: location,
+
         },
       });
 
@@ -45,6 +48,8 @@ export const userController = new Elysia({ prefix: "/user" })
         workingStyle: t.Optional(t.String()),
         ProfileImage: t.Optional(t.String()),
         bio: t.Optional(t.String()),
+        age: t.Optional(t.Number()),
+        location: t.Optional(t.String()),
       }),
         })
 
