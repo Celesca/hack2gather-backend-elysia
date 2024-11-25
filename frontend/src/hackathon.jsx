@@ -27,8 +27,8 @@ const Hackathon = () => {
   return (
     <div>
       {/* หัวรอใส่รูป */}
-      <div className="bg-gray-700 h-60 flex items-center justify-center pt-20">
-        <div className="container mx-auto text-center">
+      <div className="bg-gray-700 h-64 flex items-center justify-center">
+        <div className="container mx-auto text-center mt-20">
           <h1 className="text-3xl font-bold text-white">
             ยินดีต้อนรับสู่ H2G แหล่งรวมงาน Hackathon ที่ใหญ่ที่สุด
           </h1>

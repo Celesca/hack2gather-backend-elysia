@@ -7,7 +7,7 @@ export const userController = new Elysia({ prefix: "/user" })
   .post(
     "/create",
     async ({ body, error }) => {
-      const { userName, email, password, workingStyle, profileImage, bio } = body;
+      const { userName, email, password, workingStyle, ProfileImage, bio } = body;
 
       const existingUser = await prisma.user.findUnique({
         where: { Email: email },
@@ -30,7 +30,7 @@ export const userController = new Elysia({ prefix: "/user" })
           Bio: bio,
           Email: email,
           Password: hashPassword,
-          ProfileImage: profileImage,
+          ProfileImage: ProfileImage, // base64 string
           WorkingStyle: workingStyle,
         },
       });
@@ -43,7 +43,7 @@ export const userController = new Elysia({ prefix: "/user" })
         email: t.String(),
         password: t.String(),
         workingStyle: t.Optional(t.String()),
-        profileImage: t.Optional(t.String()),
+        ProfileImage: t.Optional(t.String()),
         bio: t.Optional(t.String()),
       }),
         })
@@ -82,6 +82,29 @@ export const userController = new Elysia({ prefix: "/user" })
   }
 )
 
+// Get user details by userID
+.get("/id/:UserID", async ({ params: { UserID  }, error }) => {
+  const user = await prisma.user.findUnique({
+    where: { UserID: UserID  },
+    select: {
+      UserID: true, // เพิ่ม UserID เพื่อใช้อ้างอิง
+      UserName: true,
+      Email: true,
+      WorkingStyle: true,
+      ProfileImage: true,
+      Bio: true,
+    },
+  });
+
+  if (!user) {
+    return error(404, "User not found");
+  }
+
+  return user;
+})
+
+
+
 
   // Get user details by userID
   .get(
@@ -114,49 +137,47 @@ export const userController = new Elysia({ prefix: "/user" })
   )
 
   // Update user profile
-  .put(
-    "/:userID",
-    async ({ params: { userID }, body, error }) => {
-      const { userName, email, password, workingStyle, profileImage, bio } = body;
+.put(
+  "/:userID",
+  async ({ params: { userID }, body, error }) => {
+    const { userName, email, workingStyle, profileImage, bio } = body;
 
-      // Check if the user exists
-      const user = await prisma.user.findUnique({
-        where: { UserID: userID },
-      });
+    // Check if the user exists
+    const user = await prisma.user.findUnique({
+      where: { UserID: userID },
+    });
 
-      if (!user) {
-        return error(404, "User not found");
-      }
+    if (!user) {
+      return error(404, "User not found");
+    }
 
-      // Update the user
-      const updatedUser = await prisma.user.update({
-        where: { UserID: userID },
-        data: {
-          UserName: userName,
-          Email: email,
-          Password: password,
-          WorkingStyle: workingStyle,
-          ProfileImage: profileImage,
-          Bio: bio,
-        },
-      });
+    // Update the user
+    const updatedUser = await prisma.user.update({
+      where: { UserID: userID },
+      data: {
+        UserName: userName || user.UserName,
+        Email: email || user.Email,
+        WorkingStyle: workingStyle || user.WorkingStyle,
+        ProfileImage: profileImage || user.ProfileImage,
+        Bio: bio || user.Bio,
+      },
+    });
 
-      return updatedUser; // Return the updated user
-    },
-    {
-      params: t.Object({
-        userID: t.String(),
-      }),
-      body: t.Object({
-        userName: t.Optional(t.String()),
-        email: t.Optional(t.String()),
-        password: t.Optional(t.String()),
-        workingStyle: t.Optional(t.String()),
-        profileImage: t.Optional(t.String()),
-        bio: t.Optional(t.String()),
+    return updatedUser; // Return the updated user
+  },
+  {
+    params: t.Object({
+      userID: t.String(),
+    }),
+    body: t.Object({
+      userName: t.Optional(t.String()),
+      email: t.Optional(t.String()),
+      workingStyle: t.Optional(t.String()),
+      profileImage: t.Optional(t.String()),
+      bio: t.Optional(t.String()),
     }),
   }
-  )
+)
 
   // Get all users
   .get(
