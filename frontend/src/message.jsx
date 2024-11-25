@@ -19,13 +19,13 @@ const Message = () => {
   const [activeUser, setActiveUser] = useState(null);
   const [userID, setUserID] = useState(null);
   const [chats, setChats] = useState([]);
+  const [messages, setMessages] = useState([]);
 
   const fetchChats = async () => {
     try {
       const response = await axios.get(
         `http://localhost:3000/message/inbox/${userID}`
       );
-      console.log(response.data);
       const chats = response.data.map((chat) => ({
         UserID: chat.otherUser.UserID,
         UserName: chat.otherUser.UserName,
@@ -44,7 +44,9 @@ const Message = () => {
       const response = await axios.get(
         `http://localhost:3000/message/${userID}/${receiverID}`
       );
-      console.log(response.data);
+      // setMessages from the response.data
+      setMessages(response.data);
+      console.log(messages);
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
@@ -71,7 +73,7 @@ const Message = () => {
       {chats.length > 0 ? (
         <div className="flex flex-1 pt-4">
           <ChatList chats={chats} onSelectChat={handleChatSelect} />
-          <ChatBox activeUser={activeUser} />
+          <ChatBox activeUser={activeUser} messages={messages} />
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center w-full h-full">
