@@ -10,6 +10,7 @@ import { hackathonController } from "./controllers/hackathonController";
 import { teamController } from "./controllers/teamController";
 import { ratingController } from "./controllers/ratingController";
 import { personalController } from "./controllers/personalController";
+import { webSocketController } from "./controllers/webSocketController";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
