@@ -2,10 +2,11 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 import axios from 'axios';
 
-const ChatBox = ({ activeUser, messages }) => {
+const ChatBox = ({ activeUser, messages, handleSendMessage }) => {
 
   const UserID = localStorage.getItem('UserID');
   const [senderImage, setSenderImage] = useState(null);
+  const [newMessage, setNewMessage] = useState('');
 
   // Fetching the User Profile Image
   const fetchProfileImage = async (UserID) => {
@@ -18,6 +19,14 @@ const ChatBox = ({ activeUser, messages }) => {
   };
 
   fetchProfileImage(UserID);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (newMessage.trim()) {
+      handleSendMessage(newMessage);
+      setNewMessage('');
+    }
+  };
 
   if (!activeUser) {
     return (
@@ -73,11 +82,21 @@ const ChatBox = ({ activeUser, messages }) => {
 
         {/* Message Input */}
       <div className="p-4 bg-white border-t">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        <form onSubmit={handleSubmit} className="p-4 bg-white border-t flex gap-2">
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type a message..."
+            className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button 
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          >
+            Send
+          </button>
+        </form>
       </div>
     </div>
   );
@@ -100,6 +119,7 @@ ChatBox.propTypes = {
       ReadStatus: PropTypes.bool.isRequired,
     })
   ),
+  handleSendMessage: PropTypes.func.isRequired,
 };
 
 export default ChatBox;

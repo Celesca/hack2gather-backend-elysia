@@ -63,12 +63,24 @@ const Message = () => {
     fetchMessages(receiverData.UserID);
   };
 
+  const handleSendMessage = async (message) => {
+    try {
+      await axios.post("http://localhost:3000/message", {
+        SenderID: userID,
+        ReceiverID: activeUser.UserID,
+        MessageContent: message,
+      });
+      fetchMessages(activeUser.UserID);
+    } catch (error) {
+      console.error("Error sending message:", error);
+  }};
+
   return (
     <div className="flex h-screen bg-gray-100">
       {chats.length > 0 ? (
         <div className="flex flex-1 pt-4">
           <ChatList chats={chats} onSelectChat={handleChatSelect} />
-          <ChatBox activeUser={activeUser} messages={messages} />
+          <ChatBox activeUser={activeUser} messages={messages} handleSendMessage={handleSendMessage} />
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center w-full h-full">
