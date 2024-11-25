@@ -34,7 +34,7 @@ const EditProfileModal = ({ isOpen, onClose, onSave, user }) => {
 
       Swal.fire({
         title: "Good job!",
-        text: "Register Sucessful!",
+        text: "Update Profile successful!",
         icon: "success"
       });
       setTimeout(() => {
@@ -197,12 +197,42 @@ AddSkillModal.propTypes = {
   onSave: PropTypes.func.isRequired,
 };
 
+
 // AddPersonalTypeModal component
 const AddPersonalTypeModal = ({ isOpen, onClose, onSave }) => {
   const [personalType, setPersonalType] = useState('');
+  const [personalTypeDetail, setPersonalTypeDetail] = useState('');
 
-  const handleSubmit = () => {
-    onSave(personalType);
+  const handleSubmit = async () => {
+    try {
+      const createResponse = await Axios.post('http://localhost:3000/personal/create', {
+        personalType,
+        personalTypeDetail,
+      });
+
+      const newPersonalType = createResponse.data;
+
+      const userID = localStorage.getItem('UserID');
+      await Axios.post('http://localhost:3000/personal/addToUser', {
+        userID,
+        personalTypeID: newPersonalType.PersonalTypeID,
+      });
+
+      onSave(newPersonalType);
+
+      Swal.fire({
+        title: "Good job!",
+        text: "Personal Type Added Successfully!",
+        icon: "success"
+      });
+      setTimeout(() => {
+        Swal.close();
+      }, 3000);
+
+      onClose();
+    } catch (error) {
+      console.error('Error creating personal type:', error);
+    }
   };
 
   if (!isOpen) return null;
@@ -210,25 +240,29 @@ const AddPersonalTypeModal = ({ isOpen, onClose, onSave }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="w-full max-w-md bg-gradient-to-b from-bluebg to-skybg text-white rounded-lg p-5 shadow-lg">
-        <form onSubmit={(e) => e.preventDefault()}>
+      <form onSubmit={(e) => e.preventDefault()}>
           <h1 className="text-4xl font-bold text-center mb-6">Add Personal Type</h1>
           <div className="relative mb-4">
-
-          <a 
-            href='https://www.arealme.com/disc-personality-test/th/' 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="mb-5 w-full block text-center px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300"
-          >
-            ประเมิน personal type
-          </a>
-
+            <a 
+              href='https://www.arealme.com/disc-personality-test/th/' 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="mb-5 w-full block text-center px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300"
+            >
+              ประเมิน personal type
+            </a>
             <input
               type="text"
               placeholder="กรอกผลลัพธ์ Personal Type"
               required
               className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
               onChange={(e) => setPersonalType(e.target.value)}
+            />
+            <textarea
+              placeholder="รายละเอียด Personal Type"
+              required
+              className="w-full h-32 px-4 py-2 mt-4 bg-transparent border border-white rounded-lg text-white placeholder-white focus:outline-none focus:border-white resize-none"
+              onChange={(e) => setPersonalTypeDetail(e.target.value)}
             />
           </div>
           <div className="flex justify-between mt-6">
