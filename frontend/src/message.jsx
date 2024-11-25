@@ -1,8 +1,7 @@
-
-function message() {
+const Message = () => {
   return (
-    <div>message</div>
+    <div>Message</div>
   )
 }
 
-export default message
+export default Message;

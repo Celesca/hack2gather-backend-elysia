@@ -14,9 +14,8 @@ import LoginForm from "./LoginForm";
 import Profile from "./profile";
 import EventDetail from './EventDetail';
 import Personal from "./personal";
-
 import Hackathon from "./hackathon";
-import Inbox from "./Inbox";
+import Message from "./message";
 
 const router = createBrowserRouter([
   {
@@ -100,11 +99,11 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />
   }, 
   {
-    path: "/inbox",
+    path: "/message",
     element: (
       <>
         <Navbar />
-        <Inbox />
+        <Message />
       </>
     ),
     errorElement: <ErrorPage />
