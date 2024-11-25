@@ -89,7 +89,7 @@ export const messageController = new Elysia({ prefix: "/message" })
     }
 
     // Get the latest message from each conversation
-    const latestMessages = await prisma.$queryRaw`
+    const latestMessages: any[] = await prisma.$queryRaw`
         SELECT 
           m1.*
         FROM 
@@ -110,6 +110,17 @@ export const messageController = new Elysia({ prefix: "/message" })
           GREATEST(m1.SenderID, m1.ReceiverID) = m2.user2 AND 
           m1.Timestamp = m2.maxTimestamp
       `;
+
+    // get the user information of the other user in the conversation
+    for (let i = 0; i < latestMessages.length; i++) {
+      const message = latestMessages[i];
+      const otherUser = await prisma.user.findUnique({
+        where: { UserID: message.SenderID === userID ? message.ReceiverID : message.SenderID },
+      });
+
+      latestMessages[i].otherUser = otherUser;
+    }
+
 
     return latestMessages;
   })
