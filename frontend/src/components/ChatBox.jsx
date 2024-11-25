@@ -1,6 +1,23 @@
 import PropTypes from 'prop-types';
+import { useState } from 'react';
+import axios from 'axios';
 
 const ChatBox = ({ activeUser, messages }) => {
+
+  const UserID = localStorage.getItem('UserID');
+  const [senderImage, setSenderImage] = useState(null);
+
+  // Fetching the User Profile Image
+  const fetchProfileImage = async (UserID) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/user/${UserID}`);
+      setSenderImage(response.data.ProfileImage);
+    } catch (error) {
+      console.error('Error fetching profile image:', error);
+    }
+  };
+
+  fetchProfileImage(UserID);
 
   if (!activeUser) {
     return (
@@ -42,8 +59,8 @@ const ChatBox = ({ activeUser, messages }) => {
             {msg.MessageContent}
                 </div>
                 <img 
-            src={msg.SenderID.ProfileImage} 
-            alt={msg.SenderID.UserName} 
+            src={senderImage} 
+            alt={senderImage} 
             className="w-8 h-8 rounded-full ml-2"
                 />
               </div>
