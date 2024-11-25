@@ -21,7 +21,9 @@ model User {
   WorkingStyle     String?
   ProfileImage     String?
   Bio              String?
-  AverageRating    Float?
+  AverageRating    Float?         // Calculated from UserRating
+  PersonalType     PersonalType?  @relation(fields: [PersonalTypeID], references: [PersonalTypeID])
+  PersonalTypeID   Int?
   CreatedAt        DateTime       @default(now())
   UpdatedAt        DateTime       @default(now()) @updatedAt
   MessagesSent     Message[]      @relation("MessagesSent")
@@ -29,8 +31,21 @@ model User {
   SwipesMade       Swipe[]        @relation("SwipesMade")
   SwipesReceived   Swipe[]        @relation("SwipesReceived")
   Notifications    Notification[]
-  UserSkills       UserSkills[] // Relation to UserSkills (many-to-many with Skills)
-  UserTeams        UserTeam[] // Relation to UserTeam (many-to-many with Teams)
+  UserSkills       UserSkills[]   // Relation to UserSkills (many-to-many with Skills)
+  UserTeams        UserTeam[]     // Relation to UserTeam (many-to-many with Teams)
+  RatingsGiven     UserRating[]   @relation("RatingsGiven") // Ratings this user has given
+  RatingsReceived  UserRating[]   @relation("RatingsReceived") // Ratings this user has received
+}
+
+model UserRating {
+  UserRatingID Int      @id @default(autoincrement()) // Primary Key
+  RatedBy      User     @relation("RatingsGiven", fields: [RatedByID], references: [UserID])
+  RatedByID    String
+  RatedUser    User     @relation("RatingsReceived", fields: [RatedUserID], references: [UserID])
+  RatedUserID  String
+  RatingValue  Int      // Rating value (e.g., 1-5 stars)
+  Comment      String?  // Optional comment
+  CreatedAt    DateTime @default(now())
 }
 
 model Message {
@@ -109,4 +124,11 @@ model UserTeam {
   TeamID     Int
   Role       String // Role of the user in the team (e.g., Member, Leader)
   JoinedAt   DateTime @default(now())
+}
+
+model PersonalType {
+  PersonalTypeID   Int       @id @default(autoincrement())
+  PersonalType     String
+  PersonalTypeDetail String
+  Users            User[]
 }
