@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import ChatList from './components/ChatList';
-import ChatBox from './components/ChatBox';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import ChatList from "./components/ChatList";
+import ChatBox from "./components/ChatBox";
+import axios from "axios";
 
 // Schemas for Inbox
 // MessageID: int
@@ -11,63 +11,77 @@ import axios from 'axios';
 // otherUser: {
 // UserID: int, UserName, ProfileImage
 
+// Example of chats
+// const chats = [
+//   { UserID: 1, UserName: 'Alice', ProfileImage: '/profile1.jpg', }, ]
+
 const Message = () => {
-  const [activeChat, setActiveChat] = useState(null);
+  const [activeUser, setActiveUser] = useState(null);
   const [userID, setUserID] = useState(null);
   const [chats, setChats] = useState([]);
 
-  // Example of chats
-  // const chats = [
-  //   { UserID: 1, UserName: 'Alice', ProfileImage: '/profile1.jpg', }, ]
-
   const fetchChats = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/message/inbox/${userID}`);
+      const response = await axios.get(
+        `http://localhost:3000/message/inbox/${userID}`
+      );
       console.log(response.data);
-      const chats = response.data.map(chat => ({
+      const chats = response.data.map((chat) => ({
         UserID: chat.otherUser.UserID,
         UserName: chat.otherUser.UserName,
         ProfileImage: chat.otherUser.ProfileImage,
-        MessageContent: chat.MessageContent
+        MessageContent: chat.MessageContent,
       }));
       setChats(chats);
-
       console.log(chats);
-      // setChats(response.data);
     } catch (error) {
-      console.error('Error fetching chats:', error);
+      console.error("Error fetching chats:", error);
     }
   };
 
+  const fetchMessages = async (receiverID) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/message/${userID}/${receiverID}`
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  }
+
   useEffect(() => {
-    const user = localStorage.getItem('UserID');
+    const user = localStorage.getItem("UserID");
     if (user) {
       setUserID(user);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     fetchChats();
   }, [userID]);
 
-  const handleChatSelect = (contact) => {
-    setActiveChat(contact);
+  const handleChatSelect = (receiverData) => {
+    setActiveUser(receiverData);
+    fetchMessages(receiverData.UserID);
   };
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {chats ? (
+      {chats.length > 0 ? (
         <div className="flex flex-1 pt-4">
           <ChatList chats={chats} onSelectChat={handleChatSelect} />
-          <ChatBox activeChat={activeChat} />
+          <ChatBox activeUser={activeUser} />
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center w-full h-full">
           <img src="/undraw_friends.svg" alt="Friends" className="w-1/5" />
-          <p className="text-lg text-gray-700 mb-4">Try to make new friends by Matching Feature</p>
+          <p className="text-lg text-gray-700 mb-4">
+            Try to make new friends by Matching Feature
+          </p>
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded"
-            onClick={() => window.location.href = '/swipe'}
+            onClick={() => (window.location.href = "/swipe")}
           >
             Go to Matching Feature
           </button>
