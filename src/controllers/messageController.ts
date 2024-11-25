@@ -161,4 +161,28 @@ export const messageController = new Elysia({ prefix: "/message" })
         messageID: t.String(),
       }),
     }
-  );
+  )
+
+// Change to ReadStatus of a message
+.put("/read/:messageID", async ({ params, error }) => {
+  const { messageID } = params;
+
+  // Check if the message exists
+  const message = await prisma.message.findUnique({
+    where: { MessageID: parseInt(messageID) },
+  });
+
+  if (!message) {
+    return error(404, "Message not found");
+  }
+
+  // Update the message
+  const updatedMessage = await prisma.message.update({
+    where: { MessageID: parseInt(messageID) },
+    data: {
+      ReadStatus: true,
+    },
+  });
+
+  return updatedMessage;
+});
