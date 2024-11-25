@@ -31,7 +31,16 @@ export const messageController = new Elysia({ prefix: "/message" })
         },
       });
 
+       // Also send a notification to the receiver
+      await prisma.notification.create({
+        data: {
+          UserID: receiverID,
+          NotificationContent: "You have a new message from " + sender.UserName,
+        }});
+
       return newMessage;
+
+     
     },
     {
       body: t.Object({
