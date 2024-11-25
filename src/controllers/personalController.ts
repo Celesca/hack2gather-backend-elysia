@@ -16,13 +16,8 @@ export const personalController = new Elysia({ prefix: "/personal" })
         return error(404, "User not found");
     }
 
-    // Get all personal information of the user
-    const personal = await prisma.user.findMany({
-        where: { UserID: userID },
-    });
-
     // Get the personalTypeID of the user
-    const personalTypeID = personal.length > 0 ? personal[0].PersonalTypeID : null;
+    const personalTypeID = user.PersonalTypeID;
 
     if (!personalTypeID) {
         return error(404, "Personal type not found");
@@ -32,6 +27,10 @@ export const personalController = new Elysia({ prefix: "/personal" })
     const personalType = await prisma.personalType.findUnique({
         where: { PersonalTypeID: personalTypeID },
     });
+
+    if (!personalType) {
+        return error(404, "Personal type not found");
+    }
 
     // Return the json of the userID and the personalType
     return {
@@ -140,7 +139,7 @@ export const personalController = new Elysia({ prefix: "/personal" })
     }),
 })
 
-// delete the user
+// Delete the personal type of the user
 .delete('/:userID', async ({ params, error }) => {
     const { userID } = params;
 
@@ -162,7 +161,6 @@ export const personalController = new Elysia({ prefix: "/personal" })
     });
 
     return updatedPersonal;
-
 }, {
     params: t.Object({
         userID: t.String(),
