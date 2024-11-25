@@ -98,6 +98,8 @@ export const userController = new Elysia({ prefix: "/user" })
       WorkingStyle: true,
       ProfileImage: true,
       Bio: true,
+      Age: true,
+      Location: true,
     },
   });
 
