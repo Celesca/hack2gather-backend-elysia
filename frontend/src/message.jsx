@@ -56,7 +56,7 @@ const Message = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {activeChat ? (
+      {chats ? (
         <div className="flex flex-1 pt-4">
           <ChatList chats={chats} onSelectChat={handleChatSelect} />
           <ChatBox activeChat={activeChat} />
