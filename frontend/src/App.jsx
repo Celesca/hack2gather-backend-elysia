@@ -20,7 +20,7 @@ function App() {
               3000,
               'Finding friends',
               3000,
-              'explring hackathons'
+              'exploring hackathons'
             ]}
             wrapper="h1"
             cursor={true}
