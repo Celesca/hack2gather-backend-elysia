@@ -150,8 +150,42 @@ EditProfileModal.propTypes = {
 const AddSkillModal = ({ isOpen, onClose, onSave }) => {
   const [skill, setSkill] = useState('');
 
-  const handleSubmit = () => {
-    onSave(skill);
+  const handleSubmit = async () => {
+    try {
+      // Create the new skill
+      const createResponse = await Axios.post('http://localhost:3000/skill/create', {
+        skillName: skill,
+      });
+
+      const newSkill = createResponse.data;
+
+      // Add the new skill to the user
+      const userID = localStorage.getItem('UserID');
+      await Axios.post('http://localhost:3000/skill/add-to-user', {
+        userID,
+        skillName: newSkill.Skill_Name,
+      });
+
+      onSave(newSkill);
+
+      Swal.fire({
+        title: "Good job!",
+        text: "Skill Added Successfully!",
+        icon: "success"
+      });
+      setTimeout(() => {
+        Swal.close();
+      }, 3000);
+
+      onClose();
+    } catch (error) {
+      console.error('Error creating skill:', error);
+      Swal.fire({
+        title: "Error",
+        text: "There was an error adding the skill.",
+        icon: "error"
+      });
+    }
   };
 
   if (!isOpen) return null;
@@ -196,6 +230,7 @@ AddSkillModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
 };
+
 
 
 // AddPersonalTypeModal component
