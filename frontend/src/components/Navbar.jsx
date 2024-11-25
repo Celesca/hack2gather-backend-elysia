@@ -148,7 +148,7 @@ function Navbar() {
               </>
             )}
             <NotificationBell />
-            <a href="/inbox" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+            <a href="/message" className="text-white hover:text-purple-200 transition duration-300 font-medium">
               <InboxIcon className="h-6 w-6" />
             </a>
             
@@ -200,7 +200,7 @@ function Navbar() {
                 </>
               )}
               <NotificationBell />
-              <a href="/inbox" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+              <a href="/message" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                 <InboxIcon className="h-6 w-6" />
               </a>
 

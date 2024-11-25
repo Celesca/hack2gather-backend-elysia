@@ -1,7 +1,29 @@
+import { useState } from 'react';
+import ChatList from './components/ChatList';
+import ChatBox from './components/ChatBox';
+
 const Message = () => {
+  const [activeChat, setActiveChat] = useState(null);
+
+  const contacts = [
+    { id: 1, name: 'John Doe', message: 'Hey! How are you?' },
+    { id: 2, name: 'Jane Smith', message: 'Let’s catch up soon!' },
+    { id: 3, name: 'Mark Taylor', message: 'Check this out.' },
+  ];
+
+  const handleChatSelect = (contact) => {
+    setActiveChat(contact);
+  };
+
   return (
-    <div>Message</div>
-  )
-}
+    <div className="flex h-screen bg-gray-100">
+      {/* Chat List */}
+      <ChatList contacts={contacts} onSelectChat={handleChatSelect} />
+
+      {/* Chat Box */}
+      <ChatBox activeChat={activeChat} />
+    </div>
+  );
+};
 
 export default Message;
