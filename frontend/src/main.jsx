@@ -16,6 +16,7 @@ import EventDetail from './EventDetail';
 import Personal from "./personal";
 
 import Hackathon from "./hackathon";
+import Inbox from "./Inbox";
 
 const router = createBrowserRouter([
   {
@@ -94,6 +95,16 @@ const router = createBrowserRouter([
       <>
         <Navbar />
         <Personal />
+      </>
+    ),
+    errorElement: <ErrorPage />
+  }, 
+  {
+    path: "/inbox",
+    element: (
+      <>
+        <Navbar />
+        <Inbox />
       </>
     ),
     errorElement: <ErrorPage />
