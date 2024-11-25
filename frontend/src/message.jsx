@@ -23,15 +23,14 @@ const Message = () => {
     }
   };
 
-  fetchChats();
-
   useEffect(() => {
     const user = localStorage.getItem('UserID');
     if (user) {
       setUserID(user);
-      console.log(user);
     }
   }, [])
+
+  fetchChats();
 
 
 
@@ -41,14 +40,22 @@ const Message = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      
-      <div className="flex flex-1 pt-4">
-        
-        <ChatList contacts={contacts} onSelectChat={handleChatSelect} />
-
-        {/* Chat Box */}
-        <ChatBox activeChat={activeChat} />
-      </div>
+      {activeChat ? (
+        <div className="flex flex-1 pt-4">
+          <ChatList contacts={contacts} onSelectChat={handleChatSelect} />
+          <ChatBox activeChat={activeChat} />
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center w-full h-full">
+          <p className="text-lg text-gray-700 mb-4">Try to make new friends by Matching Feature</p>
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded"
+            onClick={() => window.location.href = '/matching'}
+          >
+            Go to Matching Feature
+          </button>
+        </div>
+      )}
     </div>
   );
 };
