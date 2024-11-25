@@ -90,11 +90,25 @@ export const messageController = new Elysia({ prefix: "/message" })
 
     // Get the latest message from each conversation
     const latestMessages = await prisma.$queryRaw`
-        SELECT DISTINCT ON (LEAST("SenderID", "ReceiverID"), GREATEST("SenderID", "ReceiverID"))
-          "MessageID", "SenderID", "ReceiverID", "MessageContent", "Timestamp"
-        FROM "Message"
-        WHERE "SenderID" = ${userID} OR "ReceiverID" = ${userID}
-        ORDER BY LEAST("SenderID", "ReceiverID"), GREATEST("SenderID", "ReceiverID"), "Timestamp" DESC
+        SELECT 
+          m1.*
+        FROM 
+          Message m1
+        INNER JOIN (
+          SELECT 
+            LEAST(SenderID, ReceiverID) AS user1,
+            GREATEST(SenderID, ReceiverID) AS user2,
+            MAX(Timestamp) AS maxTimestamp
+          FROM 
+            Message
+          WHERE 
+            SenderID = ${userID} OR ReceiverID = ${userID}
+          GROUP BY 
+            user1, user2
+        ) m2 ON 
+          LEAST(m1.SenderID, m1.ReceiverID) = m2.user1 AND 
+          GREATEST(m1.SenderID, m1.ReceiverID) = m2.user2 AND 
+          m1.Timestamp = m2.maxTimestamp
       `;
 
     return latestMessages;
