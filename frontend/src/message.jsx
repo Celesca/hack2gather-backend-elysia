@@ -17,11 +17,14 @@ const Message = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Chat List */}
-      <ChatList contacts={contacts} onSelectChat={handleChatSelect} />
+      
+      <div className="flex flex-1 pt-4">
+        
+        <ChatList contacts={contacts} onSelectChat={handleChatSelect} />
 
-      {/* Chat Box */}
-      <ChatBox activeChat={activeChat} />
+        {/* Chat Box */}
+        <ChatBox activeChat={activeChat} />
+      </div>
     </div>
   );
 };
