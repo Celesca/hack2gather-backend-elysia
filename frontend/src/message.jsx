@@ -56,9 +56,7 @@ const Message = () => {
     }
   }, []);
 
-  useEffect(() => {
-    fetchChats();
-  }, [userID]);
+  fetchChats();
 
   const handleChatSelect = (receiverData) => {
     setActiveUser(receiverData);
