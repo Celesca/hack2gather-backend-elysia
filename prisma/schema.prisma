@@ -24,6 +24,8 @@ model User {
   AverageRating    Float?         // Calculated from UserRating
   PersonalType     PersonalType?  @relation(fields: [PersonalTypeID], references: [PersonalTypeID])
   PersonalTypeID   Int?
+  Location         String?
+  Age              Int?
   CreatedAt        DateTime       @default(now())
   UpdatedAt        DateTime       @default(now()) @updatedAt
   MessagesSent     Message[]      @relation("MessagesSent")
