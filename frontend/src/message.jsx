@@ -65,10 +65,10 @@ const Message = () => {
 
   const handleSendMessage = async (message) => {
     try {
-      await axios.post("http://localhost:3000/message", {
-        SenderID: userID,
-        ReceiverID: activeUser.UserID,
-        MessageContent: message,
+      await axios.post("http://localhost:3000/message/send", {
+        senderID: userID,
+        receiverID: activeUser.UserID,
+        messageContent: message,
       });
       fetchMessages(activeUser.UserID);
     } catch (error) {
