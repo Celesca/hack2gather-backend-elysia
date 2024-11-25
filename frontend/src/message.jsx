@@ -33,7 +33,7 @@ const Message = () => {
         MessageContent: chat.MessageContent,
       }));
       setChats(chats);
-      console.log(chats);
+      // console.log(chats);
     } catch (error) {
       console.error("Error fetching chats:", error);
     }
@@ -46,7 +46,7 @@ const Message = () => {
       );
       // setMessages from the response.data
       setMessages(response.data);
-      console.log(messages);
+      console.log(activeUser);
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
