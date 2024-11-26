@@ -50,7 +50,7 @@ export const teamController = new Elysia({ prefix: "/team" })
 )
 
 .post("/create", async ({ body, error }) => {
-    const { teamName, hackathonID, MaxMember } = body;
+    const { teamName, hackathonID, maxMember } = body;
 
     // Check if team and hackathonID exists
     const hackathon = await prisma.hackathon.findUnique({
@@ -73,6 +73,8 @@ export const teamController = new Elysia({ prefix: "/team" })
         data: {
             TeamName: teamName,
             HackathonID: hackathonID,
+            MaxMember: maxMember,
+            CurrentMember: 0,
         },
     });
 
@@ -83,6 +85,7 @@ export const teamController = new Elysia({ prefix: "/team" })
     body: t.Object({
         teamName: t.String(),
         hackathonID: t.Number(),
+        maxMember: t.Number(),
     }),
 })
 
