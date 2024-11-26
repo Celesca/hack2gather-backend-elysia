@@ -4,8 +4,8 @@ import { prisma } from "../prisma"; // Prisma client
 export const personalController = new Elysia({ prefix: "/personal" })
 
 // Get PersonalType of the user
-.get("/:userID", async ({ params, error }) => {
-    const { userID } = params;
+.get("/:userID", async ({ params: { userID }, error }) => {
+    console.log(`Fetching personal type for userID: ${userID}`);
 
     // Check if the user exists
     const user = await prisma.user.findUnique({
@@ -13,6 +13,7 @@ export const personalController = new Elysia({ prefix: "/personal" })
     });
 
     if (!user) {
+        console.log(`User not found: ${userID}`);
         return error(404, "User not found");
     }
 
@@ -20,7 +21,11 @@ export const personalController = new Elysia({ prefix: "/personal" })
     const personalTypeID = user.PersonalTypeID;
 
     if (!personalTypeID) {
-        return error(404, "Personal type not found");
+        console.log(`Personal type not found for user: ${userID}`);
+        return {
+            userID: userID,
+            personalType: null,
+        };
     }
 
     // Get the personal type of the user
@@ -29,7 +34,11 @@ export const personalController = new Elysia({ prefix: "/personal" })
     });
 
     if (!personalType) {
-        return error(404, "Personal type not found");
+        console.log(`Personal type not found: ${personalTypeID}`);
+        return {
+            userID: userID,
+            personalType: null,
+        };
     }
 
     // Return the json of the userID and the personalType
@@ -165,4 +174,4 @@ export const personalController = new Elysia({ prefix: "/personal" })
     params: t.Object({
         userID: t.String(),
     }),
-})
+});

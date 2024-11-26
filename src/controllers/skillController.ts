@@ -31,6 +31,57 @@ export const skillController = new Elysia({ prefix: "/skill" })
         }
     )
 
+    .get(
+        "/:skillName",
+        async ({ params: { skillName }, error }) => {
+            const skill = await prisma.skills.findUnique({
+                where: { Skill_Name: skillName },
+            });
+
+            if (!skill) {
+                return error(404, "Skill not found");
+            }
+
+            return skill;
+        },
+        {
+            params: t.Object({
+                skillName: t.String(),
+            }),
+        }
+    )
+
+    .get(
+        "/all",
+        async () => {
+            const skills = await prisma.skills.findMany();
+            return skills;
+        }
+    )
+
+    .get(
+        "/user/:userID",
+        async ({ params: { userID }, error }) => {
+            const userSkills = await prisma.userSkills.findMany({
+                where: { UserID: userID },
+                include: {
+                    Skill: true,
+                },
+            });
+
+            if (!userSkills) {
+                return error(404, "Skills not found for user");
+            }
+
+            return userSkills.map(userSkill => userSkill.Skill);
+        },
+        {
+            params: t.Object({
+                userID: t.String(),
+            }),
+        }
+    )
+
     .delete(":skillName", async ({ params: { skillName }, error }) => {
         const skill = await prisma.skills.findUnique({
             where: { Skill_Name: skillName },
@@ -66,11 +117,9 @@ export const skillController = new Elysia({ prefix: "/skill" })
                 return error(404, "User not found");
             }
 
-
             const skill = await prisma.skills.findUnique({
                 where: { Skill_Name: skillName },
             });
-
 
             // If the skill doesn't exist, create it
             if (!skill) {
@@ -86,30 +135,30 @@ export const skillController = new Elysia({ prefix: "/skill" })
                         Skill_ID: newSkill.Skill_ID,
                     },
                 });
-                
 
+                return newSkill;
             }
 
             // If the skill exists, add it to the user
-            else {
-                const userSkill = await prisma.userSkills.findFirst({
-                    where: {
-                        UserID: userID,
-                        Skill_ID: skill.Skill_ID,
-                    },
-                });
+            const userSkill = await prisma.userSkills.findFirst({
+                where: {
+                    UserID: userID,
+                    Skill_ID: skill.Skill_ID,
+                },
+            });
 
-                if (userSkill) {
-                    return error(409, "User already has this skill");
-                }
-
-                await prisma.userSkills.create({
-                    data: {
-                        UserID: userID,
-                        Skill_ID: skill.Skill_ID,
-                    },
-                });
+            if (userSkill) {
+                return error(409, "User already has this skill");
             }
+
+            await prisma.userSkills.create({
+                data: {
+                    UserID: userID,
+                    Skill_ID: skill.Skill_ID,
+                },
+            });
+
+            return skill;
         },
         {
             body: t.Object({
@@ -166,4 +215,4 @@ export const skillController = new Elysia({ prefix: "/skill" })
                 skillName: t.String(),
             }),
         }
-    )
+    );

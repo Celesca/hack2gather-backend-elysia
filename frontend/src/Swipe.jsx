@@ -1,37 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
-import { X, Heart, MapPin, ChevronLeft } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { MapPin, ChevronLeft, X, Heart } from 'lucide-react';
+import Axios from 'axios';
 
 const Swipe = () => {
-  const [profiles] = useState([
-    {
-      name: 'น้องหงหยกหงไทย',
-      age: 99,
-      location: 'กรุงเทพมหานคร',
-      skills: ['Skill1', 'Skill2', 'Skill3'],
-      bio: 'ประวัติการเข้าร่วม',
-      imgUrl: 'https://cdn.pixabay.com/photo/2016/11/29/13/14/attractive-1869761_1280.jpg',
-      iconUrl: '/api/placeholder/50/50',
-    },
-    {
-      name: 'John Doe',
-      age: 28,
-      location: 'Bangkok',
-      skills: ['JavaScript', 'React', 'Node.js'],
-      bio: 'Experienced developer looking to contribute to hackathons!',
-      imgUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvi7HpQ-_PMSMOFrj1hwjp6LDcI-jm3Ro0Xw&s',
-      iconUrl: '/api/placeholder/50/50',
-    },
-    {
-      name: 'Jane Smith',
-      age: 25,
-      location: 'Chiang Mai',
-      skills: ['Python', 'Machine Learning', 'Data Science'],
-      bio: 'Data scientist eager to bring AI solutions to life.',
-      imgUrl: '/api/placeholder/400/400',
-      iconUrl: '/api/placeholder/50/50',
-    },
-  ]);
-
+  const [profiles, setProfiles] = useState([]);
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const [likedProfiles, setLikedProfiles] = useState([]);
   const [rejectedProfiles, setRejectedProfiles] = useState([]);
@@ -39,6 +11,20 @@ const Swipe = () => {
   const [dragDelta, setDragDelta] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const cardRef = useRef(null);
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      try {
+        const userID = localStorage.getItem('UserID');
+        const response = await Axios.get(`http://localhost:3000/swipe/${userID}`);
+        setProfiles(response.data);
+      } catch (error) {
+        console.error('Error fetching profiles:', error);
+      }
+    };
+
+    fetchProfiles();
+  }, []);
 
   const currentProfile = profiles[currentProfileIndex];
 
@@ -49,7 +35,7 @@ const Swipe = () => {
     setDragStart({ x: clientX, y: clientY });
   };
 
-  const handleDragMove = (e) => {
+  const handleDragMove = useCallback((e) => {
     if (!isDragging) return;
     const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
     const clientY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
@@ -58,9 +44,31 @@ const Swipe = () => {
       y: clientY - dragStart.y
     };
     setDragDelta(delta);
-  };
+  }, [isDragging, dragStart]);
 
-  const handleDragEnd = () => {
+  const handleLike = useCallback(async () => {
+    const userID = localStorage.getItem('UserID');
+    await Axios.post('http://localhost:3000/swipe/action', {
+      userID,
+      swipedUserID: currentProfile.UserID,
+      swipeAction: 'Like'
+    });
+    setLikedProfiles([...likedProfiles, currentProfile]);
+    setTimeout(showNextProfile, 300);
+  }, [currentProfile, likedProfiles]);
+
+  const handleReject = useCallback(async () => {
+    const userID = localStorage.getItem('UserID');
+    await Axios.post('http://localhost:3000/swipe/action', {
+      userID,
+      swipedUserID: currentProfile.UserID,
+      swipeAction: 'Dislike'
+    });
+    setRejectedProfiles([...rejectedProfiles, currentProfile]);
+    setTimeout(showNextProfile, 300);
+  }, [currentProfile, rejectedProfiles]);
+
+  const handleDragEnd = useCallback(() => {
     if (!isDragging) return;
     const threshold = window.innerWidth * 0.3;
     if (dragDelta.x > threshold) {
@@ -71,23 +79,15 @@ const Swipe = () => {
       setDragDelta({ x: 0, y: 0 });
     }
     setIsDragging(false);
-  };
+  }, [isDragging, dragDelta, handleLike, handleReject]);
 
   const showNextProfile = () => {
     setDragDelta({ x: 0, y: 0 });
     if (currentProfileIndex < profiles.length - 1) {
       setCurrentProfileIndex(currentProfileIndex + 1);
+    } else {
+      setProfiles([]);
     }
-  };
-
-  const handleLike = () => {
-    setLikedProfiles([...likedProfiles, currentProfile]);
-    setTimeout(showNextProfile, 300);
-  };
-
-  const handleReject = () => {
-    setRejectedProfiles([...rejectedProfiles, currentProfile]);
-    setTimeout(showNextProfile, 300);
   };
 
   useEffect(() => {
@@ -106,11 +106,11 @@ const Swipe = () => {
         card.removeEventListener('touchend', dragEndHandler);
       };
     }
-  }, [isDragging, dragStart]);
+  }, [isDragging, dragStart, handleDragEnd, handleDragMove]);
 
-  const rotation = (dragDelta.x / window.innerWidth) * 45;
   const opacity = Math.max(1 - Math.abs(dragDelta.x) / (window.innerWidth / 2), 0);
   const scale = Math.max(1 - Math.abs(dragDelta.x) / (window.innerWidth * 2), 0.9);
+  const rotation = dragDelta.x / 20;
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -144,7 +144,7 @@ const Swipe = () => {
               {/* Profile Image */}
               <div className="relative h-96">
                 <img
-                  src={currentProfile.imgUrl}
+                  src={currentProfile.ProfileImage}
                   alt="profile"
                   className="w-full h-full object-cover"
                 />
@@ -153,27 +153,27 @@ const Swipe = () => {
               {/* Profile Info */}
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <h2 className="text-xl font-semibold">{currentProfile.name}</h2>
-                  <span className="text-gray-600">{currentProfile.age}</span>
+                  <h2 className="text-xl font-semibold">{currentProfile.UserName}</h2>
+                  <span className="text-gray-600">{currentProfile.Age}</span>
                 </div>
 
                 <div className="flex items-center text-gray-600 mb-2">
                   <MapPin size={16} className="mr-1" />
-                  <span className="text-sm">{currentProfile.location}</span>
+                  <span className="text-sm">{currentProfile.Location}</span>
                 </div>
 
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {currentProfile.skills.map((skill, index) => (
+                  {currentProfile.UserSkills.map((skill, index) => (
                     <span 
                       key={index}
                       className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
                     >
-                      {skill}
+                      {skill.Skill.Skill_Name}
                     </span>
                   ))}
                 </div>
 
-                <p className="text-gray-600">{currentProfile.bio}</p>
+                <p className="text-gray-600">{currentProfile.Bio}</p>
               </div>
 
               {/* Like/Nope Indicators */}
@@ -214,7 +214,7 @@ const Swipe = () => {
         ) : (
           <div className="text-center p-8 bg-white rounded-xl shadow-lg">
             <h2 className="text-xl font-bold text-gray-800 mb-3">No more profiles!</h2>
-            <p className="text-gray-600">You ve seen all available profiles.</p>
+            <p className="text-gray-600">Youve seen all available profiles.</p>
           </div>
         )}
       </div>
@@ -222,4 +222,4 @@ const Swipe = () => {
   );
 };
 
-export default Swipe; 
+export default Swipe;
