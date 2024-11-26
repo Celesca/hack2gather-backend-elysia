@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import  { useState, useEffect } from 'react';
 import Axios from 'axios';
 
 const Rating = () => {
@@ -41,7 +41,7 @@ const Rating = () => {
           return;
         }
   
-        const userResponse = await Axios.get(`http://localhost:3000/user/${user.UserID}`, {
+        const userResponse = await Axios.get(`http://localhost:3000/user/UserID`, {
           params: { username: UserName },
         });
   
@@ -77,37 +77,37 @@ const Rating = () => {
     };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-r from-blue-200 to-indigo-400 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 text-center">
-          <h1 className="text-3xl font-bold text-white mb-4">Rating Teammate</h1>
+        <div className="bg-gradient-to-r from-purple-600 to-blue-400 to-indigo-600 p-4 text-center">
+          <h1 className="text-3xl font-bold text-white mb-1">Rating Teammate</h1>
         </div>
         
         <div className="p-6 space-y-6">
           <div className="space-y-4">
               <input
                 type="text"
-                placeholder="กรอกชื่อทีม"
+                placeholder="Enter Team Name"
                 value={TeamName}
                 onChange={(event) => setTeamname(event.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="text"
-                placeholder="กรอก Username"
+                placeholder="Enter Username"
                 value={UserName}
                 onChange={(event) => setUsername(event.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="number"
-                placeholder="กรอกคะแนนเป็นจำนวนเต็ม 1 ถึง 5"
+                placeholder="Enter a score as an integer from 1 to 5"
                 value={RatingValue}
                 onChange={(event) => setRatingValue(event.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <textarea
-                placeholder="กรอกความคิดเห็น"
+                placeholder="Comment"
                 value={Comment}
                 onChange={(event) => setComment(event.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

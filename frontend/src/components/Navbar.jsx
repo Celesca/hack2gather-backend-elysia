@@ -136,6 +136,9 @@ function Navbar() {
                 <a href="/hackathon" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                   Hackathon
                 </a>
+                <a href="/Rating" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                  Rating
+                  </a>
                 <a href="/swipe" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                   Match
                 </a>
