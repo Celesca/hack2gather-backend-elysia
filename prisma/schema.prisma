@@ -124,6 +124,7 @@ model UserTeam {
   UserTeamID Int      @id @default(autoincrement()) // Primary Key
   User       User     @relation(fields: [UserID], references: [UserID])
   UserID     String
+  UserName   String
   Team       Team     @relation(fields: [TeamID], references: [TeamID])
   TeamID     Int
   Role       String // Role of the user in the team (e.g., Member, Leader)

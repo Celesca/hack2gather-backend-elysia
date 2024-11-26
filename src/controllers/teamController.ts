@@ -159,6 +159,7 @@ export const teamController = new Elysia({ prefix: "/team" })
         data: {
             TeamID: teamID,
             UserID: userID,
+            UserName: user.UserName,
             Role: role,
         },
     });
