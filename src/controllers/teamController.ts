@@ -50,7 +50,7 @@ export const teamController = new Elysia({ prefix: "/team" })
 )
 
 .post("/create", async ({ body, error }) => {
-    const { teamName, hackathonID } = body;
+    const { teamName, hackathonID, maxMember } = body;
 
     // Check if team and hackathonID exists
     const hackathon = await prisma.hackathon.findUnique({
@@ -73,6 +73,8 @@ export const teamController = new Elysia({ prefix: "/team" })
         data: {
             TeamName: teamName,
             HackathonID: hackathonID,
+            MaxMember: maxMember,
+            CurrentMember: 0,
         },
     });
 
@@ -83,16 +85,18 @@ export const teamController = new Elysia({ prefix: "/team" })
     body: t.Object({
         teamName: t.String(),
         hackathonID: t.Number(),
+        maxMember: t.Number(),
     }),
 })
 
 .put("/update", async ({ body, error }) => {
-    const { teamID, teamName } = body;
+    const { teamID, teamName, maxMember } = body;
 
     const team = await prisma.team.update({
         where: { TeamID: teamID },
         data: {
             TeamName: teamName,
+            MaxMember: maxMember,
         },
     });
 
@@ -101,11 +105,12 @@ export const teamController = new Elysia({ prefix: "/team" })
     body: t.Object({
         teamID: t.Number(),
         teamName: t.String(),
+        maxMember: t.Number(),
     }),
 })
 
-.delete("/delete", async ({ body, error }) => {
-    const { teamID } = body;
+.delete("/delete/:teamID", async ({ params, error }) => {
+    const { teamID } = params;
 
     const team = await prisma.team.delete({
         where: { TeamID: teamID },
@@ -113,7 +118,7 @@ export const teamController = new Elysia({ prefix: "/team" })
 
     return team;
 }, {
-    body: t.Object({
+    params: t.Object({
         teamID: t.Number(),
     }),
 })
@@ -145,11 +150,24 @@ export const teamController = new Elysia({ prefix: "/team" })
         return error(400, "User is already a member of the team");
     }
 
+    // Check the maxNUmber and the currentMember of the team
+    if (team.CurrentMember >= team.MaxMember) {
+        return error(400, "Team is full");
+    }
+
     const response = await prisma.userTeam.create({
         data: {
             TeamID: teamID,
             UserID: userID,
             Role: role,
+        },
+    });
+
+    // Add the current member count
+    await prisma.team.update({
+        where: { TeamID: teamID },
+        data: {
+            CurrentMember: team.CurrentMember + 1,
         },
     });
 
@@ -159,5 +177,45 @@ export const teamController = new Elysia({ prefix: "/team" })
         teamID: t.Number(),
         userID: t.String(),
         role: t.String(),
+    }),
+})
+
+// Remove member from team
+.delete("/removeMember", async ({ body, error }) => {
+    const { teamID, userID } = body;
+
+    const team = await prisma.team.findUnique({
+        where: { TeamID: teamID },
+    });
+
+    if (!team) {
+        return error(404, "Team not found");
+    }
+
+    const member = await prisma.userTeam.findFirst({
+        where: { TeamID: teamID, UserID: userID },
+    });
+
+    if (!member) {
+        return error(404, "User is not a member of the team");
+    }
+
+    const response = await prisma.userTeam.delete({
+        where: { UserTeamID: member.UserTeamID },
+    });
+
+    // Remove the current member count
+    await prisma.team.update({
+        where: { TeamID: teamID },
+        data: {
+            CurrentMember: team.CurrentMember - 1,
+        },
+    });
+
+    return response;
+}, {
+    body: t.Object({
+        teamID: t.Number(),
+        userID: t.String(),
     }),
 })

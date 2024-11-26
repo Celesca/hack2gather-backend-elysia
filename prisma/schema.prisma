@@ -24,6 +24,8 @@ model User {
   AverageRating    Float?         // Calculated from UserRating
   PersonalType     PersonalType?  @relation(fields: [PersonalTypeID], references: [PersonalTypeID])
   PersonalTypeID   Int?
+  Location         String?
+  Age              Int?
   CreatedAt        DateTime       @default(now())
   UpdatedAt        DateTime       @default(now()) @updatedAt
   MessagesSent     Message[]      @relation("MessagesSent")
@@ -110,6 +112,8 @@ model Team {
   TeamID      Int        @id @default(autoincrement())
   TeamName    String
   HackathonID Int
+  MaxMember   Int
+  CurrentMember Int
   Hackathon   Hackathon  @relation(fields: [HackathonID], references: [HackathonID])
   UserTeams   UserTeam[] // Relation to UserTeam (many-to-many with Users)
   CreatedAt   DateTime   @default(now())

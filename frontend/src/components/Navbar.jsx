@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Menu, X, Bell } from 'lucide-react';
+import { Search, Menu, X, Bell, InboxIcon } from 'lucide-react';
 import axios from 'axios';
 
 function Navbar() {
@@ -148,6 +148,10 @@ function Navbar() {
               </>
             )}
             <NotificationBell />
+            <a href="/message" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+              <InboxIcon className="h-6 w-6" />
+            </a>
+            
           </div>
 
           <button
@@ -196,6 +200,10 @@ function Navbar() {
                 </>
               )}
               <NotificationBell />
+              <a href="/message" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                <InboxIcon className="h-6 w-6" />
+              </a>
+
             </div>
           </div>
         )}
