@@ -87,13 +87,13 @@ export const teamController = new Elysia({ prefix: "/team" })
 })
 
 .put("/update", async ({ body, error }) => {
-    const { teamID, teamName } = body;
+    const { teamID, teamName, MaxMember } = body;
 
     const team = await prisma.team.update({
         where: { TeamID: teamID },
         data: {
             TeamName: teamName,
-            MaxMember: MaxMember,
+            maxMember: maxMember,
         },
     });
 
