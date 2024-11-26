@@ -181,3 +181,41 @@ export const teamController = new Elysia({ prefix: "/team" })
 })
 
 // Remove member from team
+.delete("/removeMember", async ({ body, error }) => {
+    const { teamID, userID } = body;
+
+    const team = await prisma.team.findUnique({
+        where: { TeamID: teamID },
+    });
+
+    if (!team) {
+        return error(404, "Team not found");
+    }
+
+    const member = await prisma.userTeam.findFirst({
+        where: { TeamID: teamID, UserID: userID },
+    });
+
+    if (!member) {
+        return error(404, "User is not a member of the team");
+    }
+
+    const response = await prisma.userTeam.delete({
+        where: { UserTeamID: member.UserTeamID },
+    });
+
+    // Remove the current member count
+    await prisma.team.update({
+        where: { TeamID: teamID },
+        data: {
+            CurrentMember: team.CurrentMember - 1,
+        },
+    });
+
+    return response;
+}, {
+    body: t.Object({
+        teamID: t.Number(),
+        userID: t.String(),
+    }),
+})
