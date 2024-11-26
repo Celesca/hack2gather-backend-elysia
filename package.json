@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "@elysiajs/cors": "^1.1.1",
+    "@elysiajs/static": "^1.1.1",
     "@elysiajs/swagger": "^1.1.5",
     "@prisma/client": "^5.22.0",
+    "@types/uuid": "^10.0.0",
     "cors": "^2.8.5",
-    "elysia": "^1.1.25"
+    "elysia": "^1.1.24",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "bun-types": "latest",

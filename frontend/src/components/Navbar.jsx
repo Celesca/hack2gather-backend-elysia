@@ -8,14 +8,27 @@ function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem('UserID');
-    if (user) {
+    const userID = localStorage.getItem('UserID');
+    if (userID) {
       setIsLoggedIn(true);
-      fetchNotifications(user);
+      fetchUserDetails(userID);
+      fetchNotifications(userID);
     }
   }, []);
+
+  const fetchUserDetails = async (userID) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/user/id/${userID}`);
+      if (response.data.Email === 'admin@gmail.com') {
+        setIsAdmin(true);
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('UserID');
@@ -23,9 +36,9 @@ function Navbar() {
     window.location.href = '/login';
   };
 
-  const fetchNotifications = async (UserID) => {
+  const fetchNotifications = async (userID) => {
     try {
-      const response = await axios.get(`http://localhost:3000/noti/${UserID}`);
+      const response = await axios.get(`http://localhost:3000/noti/${userID}`);
       const unreadNotifications = response.data.filter(
         (notification) => !notification.ReadStatus
       );
@@ -35,12 +48,12 @@ function Navbar() {
     }
   };
 
-  const markAsRead = async (NotificationID) => {
+  const markAsRead = async (notificationID) => {
     try {
-      const UserID = localStorage.getItem('UserID');
-      await axios.put(`http://localhost:3000/noti/${UserID}/unread`, { ReadStatus: true });
+      const userID = localStorage.getItem('UserID');
+      await axios.put(`http://localhost:3000/noti/${userID}/unread`, { ReadStatus: true });
       setNotifications((prev) =>
-        prev.filter((notification) => notification.NotificationID !== NotificationID)
+        prev.filter((notification) => notification.NotificationID !== notificationID)
       );
     } catch (error) {
       console.error('Error updating notification:', error);
@@ -118,6 +131,9 @@ function Navbar() {
             </a>
             {!isLoggedIn ? (
               <>
+                <a href="/about_us" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                  About us
+                </a>
                 <a href="/register" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                   Register
                 </a>
@@ -142,19 +158,23 @@ function Navbar() {
                 <a href="/swipe" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                   Match
                 </a>
+                {isAdmin && (
+                  <a href="/dashboard" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                    Dashboard
+                  </a>
+                )}
                 <button
                   onClick={handleLogout}
                   className="text-white hover:text-purple-200 transition duration-300 font-medium"
                 >
                   Logout
                 </button>
+                <NotificationBell />
+                <a href="/message" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                  <InboxIcon className="h-6 w-6" />
+                </a>
               </>
             )}
-            <NotificationBell />
-            <a href="/message" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-              <InboxIcon className="h-6 w-6" />
-            </a>
-            
           </div>
 
           <button
@@ -169,19 +189,23 @@ function Navbar() {
           <div className="md:hidden mt-4 bg-white/5 backdrop-blur-lg rounded-lg border border-white/10">
             <div className="flex flex-col space-y-2 p-4">
               <a href="/" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-                หน้าแรก
+                Home
               </a>
               {!isLoggedIn ? (
                 <>
+                  <a href="/about_us" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                    About us
+                  </a>
                   <a href="/register" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-                    สมัครสมาชิก
+                    Register
                   </a>
                   <a href="/login" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-                    เข้าสู่ระบบ
+                    Login
                   </a>
                 </>
               ) : (
                 <>
+<<<<<<< HEAD
                   <a href="/hackathon" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                     รวม hackathon
                   </a>
@@ -201,11 +225,30 @@ function Navbar() {
                     โปรไฟล์
                   </a>
             
+=======
+                  <a href="/profile" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                    Profile
+                  </a>
+                  <a href="/EventDetail" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                    Event hackathon
+                  </a>
+                  <a href="/hackathon" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                    Hackathon
+                  </a>
+                  <a href="/swipe" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                    Match
+                  </a>
+                  {isAdmin && (
+                    <a href="/dashboard" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                      Dashboard
+                    </a>
+                  )}
+>>>>>>> 5521b039446a9f7478fdef2608edf8cee2c02c3b
                   <button
                     onClick={handleLogout}
                     className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300"
                   >
-                    ออกจากระบบ
+                    Logout
                   </button>
                 </>
               )}
@@ -213,7 +256,6 @@ function Navbar() {
               <a href="/message" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                 <InboxIcon className="h-6 w-6" />
               </a>
-
             </div>
           </div>
         )}
