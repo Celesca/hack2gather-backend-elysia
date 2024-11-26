@@ -158,6 +158,14 @@ export const teamController = new Elysia({ prefix: "/team" })
         },
     });
 
+    // Add the current member count
+    await prisma.team.update({
+        where: { TeamID: teamID },
+        data: {
+            CurrentMember: team.CurrentMember + 1,
+        },
+    });
+
     return response;
 }, {
     body: t.Object({
