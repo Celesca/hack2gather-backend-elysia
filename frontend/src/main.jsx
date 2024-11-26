@@ -13,7 +13,7 @@ import Register from "./Register";
 import LoginForm from "./LoginForm";
 import Profile from "./profile";
 import EventDetail from './EventDetail';
-import Personal from "./personal";
+import Rating from "./Rating";
 
 import Hackathon from "./hackathon";
 
@@ -89,11 +89,11 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />
   },
   {
-    path: "/Personal",
+    path: "/Rating",
     element: (
       <>
         <Navbar />
-        <Personal />
+        <Rating />
       </>
     ),
     errorElement: <ErrorPage />

@@ -108,6 +108,9 @@ function Navbar() {
                   <a href="/EventDetail" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                     กิจกรรม hackathon
                   </a>
+                  <a href="/Rating" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                    Rating
+                  </a>
                   <a href="/Personal" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                     personal Type
                   </a>
