@@ -150,6 +150,11 @@ export const teamController = new Elysia({ prefix: "/team" })
         return error(400, "User is already a member of the team");
     }
 
+    // Check the maxNUmber and the currentMember of the team
+    if (team.CurrentMember >= team.MaxMember) {
+        return error(400, "Team is full");
+    }
+
     const response = await prisma.userTeam.create({
         data: {
             TeamID: teamID,
@@ -174,3 +179,5 @@ export const teamController = new Elysia({ prefix: "/team" })
         role: t.String(),
     }),
 })
+
+// Remove member from team
