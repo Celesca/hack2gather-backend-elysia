@@ -5,55 +5,37 @@ import { useParams } from 'react-router-dom';
 import { useCallback } from "react";
 const EventDetail = () => {
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
-  const [teamName, setTeamName] = useState('');
+  const [Teamlist, setTeamlist] = useState([]);
+  const [TeamName, setTeamName] = useState('');
   const { HackathonID } = useParams();
-  console.log("Route param HackathonID:", HackathonID);
+  console.log("HackathonID:", HackathonID);
   const [Hackathondetaillist, setHackathondetaillist] = useState([]);
 
-const getHackathondetail = useCallback(async () => {
-  try {
-    const response = await Axios.get(`http://localhost:3000/hackathon/${HackathonID}`);
-    const filteredData = response.data.filter(hackathon => hackathon.HackathonID === HackathonID);
-    const data = filteredData.map(hackathon => ({
-      Name: hackathon.Name,
-      HackathonImage: hackathon.HackathonImage,
-      StartDate: hackathon.StartDate,
-      EndDate: hackathon.EndDate,
-      Location: hackathon.Location,
-      Description: hackathon.Description,
-    }));
-    setHackathondetaillist(data);
-  } catch (error) {
-    console.error('Error fetching Hackathon data:', error);
-  }
-}, [HackathonID]);
+  const getHackathondetail = useCallback(async () => {
+    try {
+      const response = await Axios.get(`http://localhost:3000/hackathon/${HackathonID}`);
+      console.log("API Response:", response.data);
+      setHackathondetaillist([response.data]);
+    } catch (error) {
+      console.error('Error fetching Hackathon data:', error);
+    }
+  }, [HackathonID]);
+
+  const getteam = useCallback(async () => {
+    try {
+      const response = await Axios.get(`http://localhost:3000/team/hackathon/${HackathonID}`);
+      console.log("team Response:", response.data);
+      setTeamlist([response.data]);
+    } catch (error) {
+      console.error('Error fetching Hackathon data:', error);
+    }
+  }, [HackathonID]);
 
 useEffect(() => {
   getHackathondetail();
-}, [getHackathondetail]);
-  // const getHackathondetail = async () => {
-  //   try {
-  //     const response = await Axios.get(`http://localhost:3000/hackathon/${HackathonID}`);
-  //     const filteredData = response.data.filter(hackathon => hackathon.HackathonID === HackathonID);
-  //     const data = filteredData.map(hackathon => ({
-  //       Name: hackathon.Name,
-  //       HackathonImage: hackathon.HackathonImage,
-  //       StartDate: hackathon.StartDate,
-  //       EndDate: hackathon.EndDate,
-  //       Location: hackathon.Location,
-  //       Description: hackathon.Description
-  //     }));
-
-  //     setHackathondetaillist(data);
-  //   } catch (error) {
-  //     console.error('Error fetching Hackathon data:', error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   getHackathondetail();
-
-  // }, [HackathonID]); 
-  // const handleJoinTeam = (teamId) => {}
+  getteam();
+}, [getHackathondetail,getteam]);
+  
 
     return (
       <div className="bg-gray-50 min-h-screen">
@@ -67,16 +49,16 @@ useEffect(() => {
             />
           </div>
           {Hackathondetaillist.map((hackathon) => (
-          <div key={hackathon.HackathonID} className="bg-gray-800 rounded shadow overflow-hidden">
+          <div key={hackathon.HackathonID} >
             <div className="flex-1">
-              <h2 className="text-4xl font-bold mb-4">{hackathon.Name}</h2>
+              <h2 className="text-6xl font-bold mb-4">{hackathon.Name}</h2>
 
               <div className="flex items-center gap-2"> 
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                 </svg>
-                <span className="text-lg font-semibold">Location {hackathon.Location}</span>
+                <span className="text-xl font-semibold mt-8 mb-1">Location {hackathon.Location}</span>
               </div>
 
               <div className="flex items-center gap-2 mt-3"> 
@@ -97,15 +79,16 @@ useEffect(() => {
             
   
         {/* Details Section */}
-        <div className="px-8 py-16 lg:px-24 bg-gray-100">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">รายละเอียดงาน</h2>
-          <p className="text-gray-600 leading-relaxed">
-            Hackhaton description Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni
-            repudiandae explicabo necessitatibus. Fugit vitae officia aut
-            voluptas, sed et facilis iusto ex iure consectetur sapiente.
-            Repudiandae doloribus quidem ipsam nesciunt!
-          </p>
-        </div>
+        {Hackathondetaillist.map((hackathon) => (
+          <div key={hackathon.HackathonID} >
+            <div className="px-8 py-16 lg:px-24 bg-gray-100">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">รายละเอียดงาน</h2>
+              <p className="text-gray-600 leading-relaxed">
+                {hackathon.Description}
+              </p>
+            </div>
+          </div>
+        ))}
   
         {/* Reviews Section */}
         {/* <div className="bg-gray-100 px-8 py-16 lg:px-24">
@@ -129,12 +112,13 @@ useEffect(() => {
               ทีมที่เปิดรับสมาชิก
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {Array.from({ length: 9 }, (_, i) => (
-                  <div key={i} className="relative bg-gray-100 rounded-lg p-6 shadow-md hover:shadow-lg transition">
+
+              {Teamlist.map((val,key) => (
+                  <div key={key} className="relative bg-gray-100 rounded-lg p-6 shadow-md hover:shadow-lg transition">
                       <div className="absolute top-4 left-4  text-gray-700 text-sm font-semibold py-1 px-3 rounded-full shadow-md">
-                          <span>👥 {i + 1}/4 members</span>
+                          <span>👥 /4 members</span>
                       </div>
-                      <h3 className="text-xl font-semibold text-gray-700 mt-8">Team {i + 1}</h3>
+                      <h3 className="text-xl font-semibold text-gray-700 mt-8">Team {val.TeamName}</h3>
                       <button
                           // onClick={() => handleJoinTeam(i)}
                           className="absolute bottom-4 right-4 px-3 py-1 bg-gradient-to-r from-blue-400 to-blue-500 text-white font-semibold rounded-full shadow-md hover:from-blue-500 hover:to-blue-600 transition-transform transform hover:-translate-y-1 hover:scale-105"
@@ -143,6 +127,7 @@ useEffect(() => {
                       </button>
                   </div>
               ))}
+
           </div>
           <div className="flex justify-center mt-8">
             <button
@@ -181,7 +166,6 @@ useEffect(() => {
                             type="text"
                             placeholder="Enter team name"
                             className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
-                            value={teamName}
                             onChange={(e) => setTeamName(e.target.value)}
                         />
                     </div>
@@ -197,7 +181,7 @@ useEffect(() => {
                         <button
                             onClick={() => {
                                 // Add create team logic here
-                                console.log({ teamName });
+                                console.log({ TeamName });
                                 setIsCreateTeamModalOpen(false);
                             }}
                             className="w-1/3 h-12 bg-green-500 text-white font-bold rounded-full shadow-md hover:bg-green-600 transition duration-300"
