@@ -14,8 +14,9 @@ import LoginForm from "./LoginForm";
 import Profile from "./profile";
 import EventDetail from './EventDetail';
 import Personal from "./personal";
-
+import Dashboard from "./Dashboard";
 import Hackathon from "./hackathon";
+import AllUsers from "./all_user";
 
 const router = createBrowserRouter([
   {
@@ -94,6 +95,26 @@ const router = createBrowserRouter([
       <>
         <Navbar />
         <Personal />
+      </>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <>
+        <Navbar />
+        <Dashboard />
+      </>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "/AllUsers",
+    element: (
+      <>
+        <Navbar />
+        <AllUsers />
       </>
     ),
     errorElement: <ErrorPage />

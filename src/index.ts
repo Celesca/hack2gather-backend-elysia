@@ -10,8 +10,18 @@ import { hackathonController } from "./controllers/hackathonController";
 import { teamController } from "./controllers/teamController";
 import { ratingController } from "./controllers/ratingController";
 import { personalController } from "./controllers/personalController";
+import { staticPlugin } from '@elysiajs/static';
+import path from 'path';
 
-const app = new Elysia()
+const app = new Elysia();
+
+// Serve static files from the 'public' directory
+// app.use(staticPlugin({
+//   assets: path.join(__dirname, 'public'),
+//   prefix: '/static', // URL prefix for static files
+// }));
+
+app
   .get("/", () => "Hello Elysia")
   .use(swagger({ path: '/v2/swagger' }))
   .use(cors({
@@ -26,10 +36,6 @@ const app = new Elysia()
   .use(teamController)
   .use(ratingController)
   .use(personalController)
-  .use(cors({
-    origin: "*",
-  }))
-  .listen(3000)
   .listen(process.env.PORT ?? 3000);
 
 console.log(

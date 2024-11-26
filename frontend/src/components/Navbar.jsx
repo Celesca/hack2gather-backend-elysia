@@ -8,14 +8,27 @@ function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem('UserID');
-    if (user) {
+    const userID = localStorage.getItem('UserID');
+    if (userID) {
       setIsLoggedIn(true);
-      fetchNotifications(user);
+      fetchUserDetails(userID);
+      fetchNotifications(userID);
     }
   }, []);
+
+  const fetchUserDetails = async (userID) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/user/id/${userID}`);
+      if (response.data.Email === 'admin@gmail.com') {
+        setIsAdmin(true);
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('UserID');
@@ -23,9 +36,9 @@ function Navbar() {
     window.location.href = '/login';
   };
 
-  const fetchNotifications = async (UserID) => {
+  const fetchNotifications = async (userID) => {
     try {
-      const response = await axios.get(`http://localhost:3000/noti/${UserID}`);
+      const response = await axios.get(`http://localhost:3000/noti/${userID}`);
       const unreadNotifications = response.data.filter(
         (notification) => !notification.ReadStatus
       );
@@ -35,12 +48,12 @@ function Navbar() {
     }
   };
 
-  const markAsRead = async (NotificationID) => {
+  const markAsRead = async (notificationID) => {
     try {
-      const UserID = localStorage.getItem('UserID');
-      await axios.put(`http://localhost:3000/noti/${UserID}/unread`, { ReadStatus: true });
+      const userID = localStorage.getItem('UserID');
+      await axios.put(`http://localhost:3000/noti/${userID}/unread`, { ReadStatus: true });
       setNotifications((prev) =>
-        prev.filter((notification) => notification.NotificationID !== NotificationID)
+        prev.filter((notification) => notification.NotificationID !== notificationID)
       );
     } catch (error) {
       console.error('Error updating notification:', error);
@@ -139,6 +152,11 @@ function Navbar() {
                 <a href="/swipe" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                   Match
                 </a>
+                {isAdmin && (
+                  <a href="/dashboard" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                    Dashboard
+                  </a>
+                )}
                 <button
                   onClick={handleLogout}
                   className="text-white hover:text-purple-200 transition duration-300 font-medium"
@@ -187,6 +205,11 @@ function Navbar() {
                   <a href="/swipe" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
                     จับคู่
                   </a>
+                  {isAdmin && (
+                    <a href="/dashboard" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                      Dashboard
+                    </a>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300"
