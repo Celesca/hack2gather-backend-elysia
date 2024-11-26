@@ -12,19 +12,20 @@ import Swipe from "./Swipe";
 import Register from "./Register";
 import LoginForm from "./LoginForm";
 import Profile from "./profile";
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
+import EventDetail from './EventDetail';
+
+import Dashboard from "./Dashboard";
+=========
 import EventDetail from "./EventDetail";
 import Rating from "./Rating";
 
-=======
-import EventDetail from './EventDetail';
-import Personal from "./personal";
-import Dashboard from "./Dashboard";
->>>>>>> 5521b039446a9f7478fdef2608edf8cee2c02c3b
+>>>>>>>>> Temporary merge branch 2
 import Hackathon from "./hackathon";
 import AllUsers from "./all_user";
 import Message from "./message";
 import About_us from "./about_us";
+import Rating from "./Rating";
 
 const router = createBrowserRouter([
   {
@@ -143,6 +144,16 @@ const router = createBrowserRouter([
       <>
         <Navbar />
         <About_us />
+      </>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "/rating",
+    element: (
+      <>
+        <Navbar />
+        <Rating />
       </>
     ),
     errorElement: <ErrorPage />
