@@ -45,6 +45,5 @@ server.exe
 
 # Frontend folder
 frontend/node_modules
-frontend
 
 bun.lockb

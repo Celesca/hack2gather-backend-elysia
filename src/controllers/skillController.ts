@@ -58,14 +58,6 @@ export const skillController = new Elysia({ prefix: "/skill" })
         async ({ body, error }) => {
             const { userID, skillName } = body;
 
-            const skill = await prisma.skills.findUnique({
-                where: { Skill_Name: skillName },
-            });
-
-            if (!skill) {
-                return error(404, "Skill not found");
-            }
-
             const user = await prisma.user.findUnique({
                 where: { UserID: userID },
             });
@@ -74,14 +66,50 @@ export const skillController = new Elysia({ prefix: "/skill" })
                 return error(404, "User not found");
             }
 
-            const userSkill = await prisma.userSkills.create({
-                data: {
-                    UserID: userID,
-                    Skill_ID: skill.Skill_ID,
-                },
+
+            const skill = await prisma.skills.findUnique({
+                where: { Skill_Name: skillName },
             });
 
-            return userSkill;
+
+            // If the skill doesn't exist, create it
+            if (!skill) {
+                const newSkill = await prisma.skills.create({
+                    data: {
+                        Skill_Name: skillName,
+                    },
+                });
+
+                await prisma.userSkills.create({
+                    data: {
+                        UserID: userID,
+                        Skill_ID: newSkill.Skill_ID,
+                    },
+                });
+                
+
+            }
+
+            // If the skill exists, add it to the user
+            else {
+                const userSkill = await prisma.userSkills.findFirst({
+                    where: {
+                        UserID: userID,
+                        Skill_ID: skill.Skill_ID,
+                    },
+                });
+
+                if (userSkill) {
+                    return error(409, "User already has this skill");
+                }
+
+                await prisma.userSkills.create({
+                    data: {
+                        UserID: userID,
+                        Skill_ID: skill.Skill_ID,
+                    },
+                });
+            }
         },
         {
             body: t.Object({

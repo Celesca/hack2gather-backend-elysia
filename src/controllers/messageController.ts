@@ -31,7 +31,16 @@ export const messageController = new Elysia({ prefix: "/message" })
         },
       });
 
+       // Also send a notification to the receiver
+      await prisma.notification.create({
+        data: {
+          UserID: receiverID,
+          NotificationContent: "You have a new message from " + sender.UserName,
+        }});
+
       return newMessage;
+
+     
     },
     {
       body: t.Object({
@@ -89,13 +98,53 @@ export const messageController = new Elysia({ prefix: "/message" })
     }
 
     // Get the latest message from each conversation
-    const latestMessages = await prisma.$queryRaw`
-        SELECT DISTINCT ON (LEAST("SenderID", "ReceiverID"), GREATEST("SenderID", "ReceiverID"))
-          "MessageID", "SenderID", "ReceiverID", "MessageContent", "Timestamp"
-        FROM "Message"
-        WHERE "SenderID" = ${userID} OR "ReceiverID" = ${userID}
-        ORDER BY LEAST("SenderID", "ReceiverID"), GREATEST("SenderID", "ReceiverID"), "Timestamp" DESC
+    const latestMessages: any[] = await prisma.$queryRaw`
+        SELECT 
+          m1.*
+        FROM 
+          Message m1
+        INNER JOIN (
+          SELECT 
+            LEAST(SenderID, ReceiverID) AS user1,
+            GREATEST(SenderID, ReceiverID) AS user2,
+            MAX(Timestamp) AS maxTimestamp
+          FROM 
+            Message
+          WHERE 
+            SenderID = ${userID} OR ReceiverID = ${userID}
+          GROUP BY 
+            user1, user2
+        ) m2 ON 
+          LEAST(m1.SenderID, m1.ReceiverID) = m2.user1 AND 
+          GREATEST(m1.SenderID, m1.ReceiverID) = m2.user2 AND 
+          m1.Timestamp = m2.maxTimestamp
       `;
+
+      // get the total number of unread messages
+    for (let i = 0; i < latestMessages.length; i++) {
+      const message = latestMessages[i];
+      const unreadMessages = await prisma.message.count({
+        where: {
+          SenderID: message.SenderID === userID ? message.ReceiverID : message.SenderID,
+          ReceiverID: userID,
+          ReadStatus: false,
+        },
+      });
+
+      latestMessages[i].unreadMessages = unreadMessages;
+    }
+
+
+    // get the user information of the other user in the conversation
+    for (let i = 0; i < latestMessages.length; i++) {
+      const message = latestMessages[i];
+      const otherUser = await prisma.user.findUnique({
+        where: { UserID: message.SenderID === userID ? message.ReceiverID : message.SenderID },
+      });
+
+      latestMessages[i].otherUser = otherUser;
+    }
+
 
     return latestMessages;
   })
@@ -127,4 +176,36 @@ export const messageController = new Elysia({ prefix: "/message" })
         messageID: t.String(),
       }),
     }
-  );
+  )
+
+// Change to ReadStatus of a message
+.put("/read/:senderID/:receiverID", async ({ params, error }) => {
+  const { senderID, receiverID } = params;
+
+  // Check if both users exist
+  const sender = await prisma.user.findUnique({
+    where: { UserID: senderID },
+  });
+
+  const receiver = await prisma.user.findUnique({
+    where: { UserID: receiverID },
+  });
+
+  if (!sender || !receiver) {
+    return error(404, "Sender or receiver not found");
+  }
+
+  // Update the ReadStatus of the messages
+  await prisma.message.updateMany({
+    where: {
+      SenderID: receiverID,
+      ReceiverID: senderID,
+      ReadStatus: false,
+    },
+    data: {
+      ReadStatus: true,
+    },
+  });
+
+  return { message: "Messages updated successfully" };
+});

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `user` ADD COLUMN `Age` INTEGER NULL,
+    ADD COLUMN `Location` VARCHAR(191) NULL;
