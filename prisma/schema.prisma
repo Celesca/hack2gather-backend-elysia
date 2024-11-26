@@ -112,6 +112,8 @@ model Team {
   TeamID      Int        @id @default(autoincrement())
   TeamName    String
   HackathonID Int
+  maxMember   Int
+  currentMember Int
   Hackathon   Hackathon  @relation(fields: [HackathonID], references: [HackathonID])
   UserTeams   UserTeam[] // Relation to UserTeam (many-to-many with Users)
   CreatedAt   DateTime   @default(now())
