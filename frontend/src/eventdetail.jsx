@@ -1,12 +1,41 @@
+import Axios from 'axios';
 import  { useState } from 'react';
-
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { useCallback } from "react";
 const EventDetail = () => {
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
-  const [teamName, setTeamName] = useState('');
-  const [StartDate, ] = useState('19/08/2025');
-  const [EndDate, ] = useState('19/19/2999');
-  const [Name, ] = useState('Hackathon 2025');
-  // const handleJoinTeam = (teamId) => {}
+  const [Teamlist, setTeamlist] = useState([]);
+  const [TeamName, setTeamName] = useState('');
+  const { HackathonID } = useParams();
+  console.log("HackathonID:", HackathonID);
+  const [Hackathondetaillist, setHackathondetaillist] = useState([]);
+
+  const getHackathondetail = useCallback(async () => {
+    try {
+      const response = await Axios.get(`http://localhost:3000/hackathon/${HackathonID}`);
+      console.log("API Response:", response.data);
+      setHackathondetaillist([response.data]);
+    } catch (error) {
+      console.error('Error fetching Hackathon data:', error);
+    }
+  }, [HackathonID]);
+
+  const getteam = useCallback(async () => {
+    try {
+      const response = await Axios.get(`http://localhost:3000/team/hackathon/${HackathonID}`);
+      console.log("team Response:", response.data);
+      setTeamlist([response.data]);
+    } catch (error) {
+      console.error('Error fetching Hackathon data:', error);
+    }
+  }, [HackathonID]);
+
+useEffect(() => {
+  getHackathondetail();
+  getteam();
+}, [getHackathondetail,getteam]);
+  
 
     return (
       <div className="bg-gray-50 min-h-screen">
@@ -19,42 +48,47 @@ const EventDetail = () => {
               className="rounded-lg shadow-lg w-full object-cover"
             />
           </div>
-          
-          <div className="flex-1">
-            <h2 className="text-4xl font-bold mb-4">{Name}</h2>
+          {Hackathondetaillist.map((hackathon) => (
+          <div key={hackathon.HackathonID} >
+            <div className="flex-1">
+              <h2 className="text-6xl font-bold mb-4">{hackathon.Name}</h2>
 
-            <div className="flex items-center gap-2"> 
+              <div className="flex items-center gap-2"> 
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                </svg>
+                <span className="text-xl font-semibold mt-8 mb-1">Location {hackathon.Location}</span>
+              </div>
+
+              <div className="flex items-center gap-2 mt-3"> 
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 2.994v2.25m10.5-2.25v2.25m-14.252 13.5V7.491a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v11.251m-18 0a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5m-6.75-6h2.25m-9 2.25h4.5m.002-2.25h.005v.006H12v-.006Zm-.001 4.5h.006v.006h-.006v-.005Zm-2.25.001h.005v.006H9.75v-.006Zm-2.25 0h.005v.005h-.006v-.005Zm6.75-2.247h.005v.005h-.005v-.005Zm0 2.247h.006v.006h-.006v-.006Zm2.25-2.248h.006V15H16.5v-.005Z" />
               </svg>
-              <span className="text-lg font-semibold">Location</span>
-            </div>
+                <span className="text-lg font-semibold">{hackathon.StartDate} - {hackathon.EndDate}</span>
+              </div>
 
-            <div className="flex items-center gap-2 mt-3"> 
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 2.994v2.25m10.5-2.25v2.25m-14.252 13.5V7.491a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v11.251m-18 0a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5m-6.75-6h2.25m-9 2.25h4.5m.002-2.25h.005v.006H12v-.006Zm-.001 4.5h.006v.006h-.006v-.005Zm-2.25.001h.005v.006H9.75v-.006Zm-2.25 0h.005v.005h-.006v-.005Zm6.75-2.247h.005v.005h-.005v-.005Zm0 2.247h.006v.006h-.006v-.006Zm2.25-2.248h.006V15H16.5v-.005Z" />
-            </svg>
-              <span className="text-lg font-semibold">{StartDate} - {EndDate}</span>
+              {/* <div className="flex items-center space-x-4">
+                <p className="text-lg">ประเภทการแข่งขัน:</p>
+                <p className="font-semibold text-xl">👫 Team</p>
+              </div> */}
             </div>
-
-            {/* <div className="flex items-center space-x-4">
-              <p className="text-lg">ประเภทการแข่งขัน:</p>
-              <p className="font-semibold text-xl">👫 Team</p>
-            </div> */}
           </div>
+          ))}
         </div>
+            
   
         {/* Details Section */}
-        <div className="px-8 py-16 lg:px-24 bg-gray-100">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">รายละเอียดงาน</h2>
-          <p className="text-gray-600 leading-relaxed">
-            Hackhaton description Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni
-            repudiandae explicabo necessitatibus. Fugit vitae officia aut
-            voluptas, sed et facilis iusto ex iure consectetur sapiente.
-            Repudiandae doloribus quidem ipsam nesciunt!
-          </p>
-        </div>
+        {Hackathondetaillist.map((hackathon) => (
+          <div key={hackathon.HackathonID} >
+            <div className="px-8 py-16 lg:px-24 bg-gray-100">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">รายละเอียดงาน</h2>
+              <p className="text-gray-600 leading-relaxed">
+                {hackathon.Description}
+              </p>
+            </div>
+          </div>
+        ))}
   
         {/* Reviews Section */}
         {/* <div className="bg-gray-100 px-8 py-16 lg:px-24">
@@ -78,12 +112,13 @@ const EventDetail = () => {
               ทีมที่เปิดรับสมาชิก
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {Array.from({ length: 9 }, (_, i) => (
-                  <div key={i} className="relative bg-gray-100 rounded-lg p-6 shadow-md hover:shadow-lg transition">
+
+              {Teamlist.map((val,key) => (
+                  <div key={key} className="relative bg-gray-100 rounded-lg p-6 shadow-md hover:shadow-lg transition">
                       <div className="absolute top-4 left-4  text-gray-700 text-sm font-semibold py-1 px-3 rounded-full shadow-md">
-                          <span>👥 {i + 1}/4 members</span>
+                          <span>👥 /4 members</span>
                       </div>
-                      <h3 className="text-xl font-semibold text-gray-700 mt-8">Team {i + 1}</h3>
+                      <h3 className="text-xl font-semibold text-gray-700 mt-8">Team {val.TeamName}</h3>
                       <button
                           // onClick={() => handleJoinTeam(i)}
                           className="absolute bottom-4 right-4 px-3 py-1 bg-gradient-to-r from-blue-400 to-blue-500 text-white font-semibold rounded-full shadow-md hover:from-blue-500 hover:to-blue-600 transition-transform transform hover:-translate-y-1 hover:scale-105"
@@ -92,6 +127,7 @@ const EventDetail = () => {
                       </button>
                   </div>
               ))}
+
           </div>
           <div className="flex justify-center mt-8">
             <button
@@ -130,7 +166,6 @@ const EventDetail = () => {
                             type="text"
                             placeholder="Enter team name"
                             className="w-full h-12 px-4 py-2 bg-transparent border border-white rounded-full text-white placeholder-white focus:outline-none focus:border-white"
-                            value={teamName}
                             onChange={(e) => setTeamName(e.target.value)}
                         />
                     </div>
@@ -146,7 +181,7 @@ const EventDetail = () => {
                         <button
                             onClick={() => {
                                 // Add create team logic here
-                                console.log({ teamName });
+                                console.log({ TeamName });
                                 setIsCreateTeamModalOpen(false);
                             }}
                             className="w-1/3 h-12 bg-green-500 text-white font-bold rounded-full shadow-md hover:bg-green-600 transition duration-300"

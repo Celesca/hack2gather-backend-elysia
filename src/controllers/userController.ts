@@ -7,7 +7,7 @@ export const userController = new Elysia({ prefix: "/user" })
   .post(
     "/create",
     async ({ body, error }) => {
-      const { userName, email, password, workingStyle, ProfileImage, bio } = body;
+      const { userName, email, password, workingStyle, ProfileImage, bio, age, location } = body;
 
       const existingUser = await prisma.user.findUnique({
         where: { Email: email },
@@ -32,6 +32,9 @@ export const userController = new Elysia({ prefix: "/user" })
           Password: hashPassword,
           ProfileImage: ProfileImage, // base64 string
           WorkingStyle: workingStyle,
+          Age: age,
+          Location: location,
+
         },
       });
 
@@ -45,6 +48,8 @@ export const userController = new Elysia({ prefix: "/user" })
         workingStyle: t.Optional(t.String()),
         ProfileImage: t.Optional(t.String()),
         bio: t.Optional(t.String()),
+        age: t.Optional(t.Number()),
+        location: t.Optional(t.String()),
       }),
         })
 
@@ -93,6 +98,8 @@ export const userController = new Elysia({ prefix: "/user" })
       WorkingStyle: true,
       ProfileImage: true,
       Bio: true,
+      Age: true,
+      Location: true,
     },
   });
 
@@ -102,9 +109,6 @@ export const userController = new Elysia({ prefix: "/user" })
 
   return user;
 })
-
-
-
 
   // Get user details by userID
   .get(
@@ -140,7 +144,7 @@ export const userController = new Elysia({ prefix: "/user" })
 .put(
   "/:userID",
   async ({ params: { userID }, body, error }) => {
-    const { userName, email, workingStyle, profileImage, bio } = body;
+    const { userName, email, workingStyle, profileImage, bio, age, location } = body;
 
     // Check if the user exists
     const user = await prisma.user.findUnique({
@@ -160,6 +164,8 @@ export const userController = new Elysia({ prefix: "/user" })
         WorkingStyle: workingStyle || user.WorkingStyle,
         ProfileImage: profileImage || user.ProfileImage,
         Bio: bio || user.Bio,
+        Age: age || user.Age,
+        Location: location || user.Location,
       },
     });
 
@@ -175,6 +181,8 @@ export const userController = new Elysia({ prefix: "/user" })
       workingStyle: t.Optional(t.String()),
       profileImage: t.Optional(t.String()),
       bio: t.Optional(t.String()),
+      age: t.Optional(t.Number()),
+      location: t.Optional(t.String()),
     }),
   }
 )
