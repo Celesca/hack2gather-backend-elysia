@@ -87,13 +87,13 @@ export const teamController = new Elysia({ prefix: "/team" })
 })
 
 .put("/update", async ({ body, error }) => {
-    const { teamID, teamName, MaxMember } = body;
+    const { teamID, teamName, maxMember } = body;
 
     const team = await prisma.team.update({
         where: { TeamID: teamID },
         data: {
             TeamName: teamName,
-            maxMember: maxMember,
+            MaxMember: maxMember,
         },
     });
 
@@ -102,11 +102,12 @@ export const teamController = new Elysia({ prefix: "/team" })
     body: t.Object({
         teamID: t.Number(),
         teamName: t.String(),
+        maxMember: t.Number(),
     }),
 })
 
-.delete("/delete", async ({ body, error }) => {
-    const { teamID } = body;
+.delete("/delete/:teamID", async ({ params, error }) => {
+    const { teamID } = params;
 
     const team = await prisma.team.delete({
         where: { TeamID: teamID },
@@ -114,7 +115,7 @@ export const teamController = new Elysia({ prefix: "/team" })
 
     return team;
 }, {
-    body: t.Object({
+    params: t.Object({
         teamID: t.Number(),
     }),
 })
