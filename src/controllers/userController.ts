@@ -103,6 +103,9 @@ export const userController = new Elysia({ prefix: "/user" })
   return user;
 })
 
+
+
+
   // Get user details by userID
   .get(
     "/:userID",
@@ -134,47 +137,47 @@ export const userController = new Elysia({ prefix: "/user" })
   )
 
   // Update user profile
-  .put(
-    "/:userID",
-    async ({ params: { userID }, body, error }) => {
-      const { userName, email, workingStyle, profileImage, bio } = body;
+.put(
+  "/:userID",
+  async ({ params: { userID }, body, error }) => {
+    const { userName, email, workingStyle, profileImage, bio } = body;
 
-      // Check if the user exists
-      const user = await prisma.user.findUnique({
-        where: { UserID: userID },
-      });
+    // Check if the user exists
+    const user = await prisma.user.findUnique({
+      where: { UserID: userID },
+    });
 
-      if (!user) {
-        return error(404, "User not found");
-      }
+    if (!user) {
+      return error(404, "User not found");
+    }
 
-      // Update the user
-      const updatedUser = await prisma.user.update({
-        where: { UserID: userID },
-        data: {
-          UserName: userName || user.UserName,
-          Email: email || user.Email,
-          WorkingStyle: workingStyle || user.WorkingStyle,
-          ProfileImage: profileImage || user.ProfileImage,
-          Bio: bio || user.Bio,
-        },
-      });
-      
-      return updatedUser; // Return the updated user
-    },
-    {
-      params: t.Object({
-        userID: t.String(),
-      }),
-      body: t.Object({
-        userName: t.Optional(t.String()),
-        email: t.Optional(t.String()),
-        workingStyle: t.Optional(t.String()),
-        profileImage: t.Optional(t.String()),
-        bio: t.Optional(t.String()),
+    // Update the user
+    const updatedUser = await prisma.user.update({
+      where: { UserID: userID },
+      data: {
+        UserName: userName || user.UserName,
+        Email: email || user.Email,
+        WorkingStyle: workingStyle || user.WorkingStyle,
+        ProfileImage: profileImage || user.ProfileImage,
+        Bio: bio || user.Bio,
+      },
+    });
+
+    return updatedUser; // Return the updated user
+  },
+  {
+    params: t.Object({
+      userID: t.String(),
+    }),
+    body: t.Object({
+      userName: t.Optional(t.String()),
+      email: t.Optional(t.String()),
+      workingStyle: t.Optional(t.String()),
+      profileImage: t.Optional(t.String()),
+      bio: t.Optional(t.String()),
     }),
   }
-  )
+)
 
   // Get all users
   .get(

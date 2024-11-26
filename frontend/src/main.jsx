@@ -12,7 +12,7 @@ import Swipe from "./Swipe";
 import Register from "./Register";
 import LoginForm from "./LoginForm";
 import Profile from "./profile";
-import EventDetail from './EventDetail';
+import EventDetail from "./EventDetail";
 import Rating from "./Rating";
 
 import Hackathon from "./hackathon";
@@ -69,7 +69,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />
   },
   {
-    path: "/EventDetail",
+    path: "/EventDetail/:HackathonID" ,
     element: (
       <>
         <Navbar />

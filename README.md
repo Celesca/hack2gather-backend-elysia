@@ -2,7 +2,8 @@
 
 Hacka is the application for hackathon finder 
 
-![image](https://github.com/user-attachments/assets/d5dfe7b4-2efe-44a4-8795-2c10f94d6259)
+![image](https://github.com/user-attachments/assets/402ad3d7-f5fa-4654-af98-3885c746f724)
+
 
 
 ```bash
