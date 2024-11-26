@@ -12,11 +12,14 @@ import Swipe from "./Swipe";
 import Register from "./Register";
 import LoginForm from "./LoginForm";
 import Profile from "./profile";
-import EventDetail from "./EventDetail";
-import Rating from "./Rating";
+import EventDetail from './EventDetail';
 
+import Dashboard from "./Dashboard";
 import Hackathon from "./hackathon";
+import AllUsers from "./all_user";
 import Message from "./message";
+import About_us from "./about_us";
+import Rating from "./Rating";
 
 const router = createBrowserRouter([
   {
@@ -98,13 +101,53 @@ const router = createBrowserRouter([
       </>
     ),
     errorElement: <ErrorPage />
-  }, 
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <>
+        <Navbar />
+        <Dashboard />
+      </>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "/AllUsers",
+    element: (
+      <>
+        <Navbar />
+        <AllUsers />
+      </>
+    ),
+    errorElement: <ErrorPage />
+  },
   {
     path: "/message",
     element: (
       <>
         <Navbar />
         <Message />
+      </>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "/about_us",
+    element: (
+      <>
+        <Navbar />
+        <About_us />
+      </>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "/rating",
+    element: (
+      <>
+        <Navbar />
+        <Rating />
       </>
     ),
     errorElement: <ErrorPage />

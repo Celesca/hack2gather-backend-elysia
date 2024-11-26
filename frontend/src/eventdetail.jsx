@@ -21,35 +21,55 @@ const EventDetail = () => {
      console.log('Teamlist:', userTeamlist);
    }, [userTeamlist]);
 
-  const jointeam = async (TeamID) => {
+  const jointeam = async (TeamID,CurrentMember,MaxMember) => {
     try {
+      if (CurrentMember == MaxMember){
+        Swal.fire({
+          title: "Sorry",
+          text: "Team is full!",
+          icon: "error"
+        });
+        setTimeout(() => {
+          Swal.close();
+        }, 3000);
+    
+        await new Promise(resolve => setTimeout(resolve, 2000));
+    
+        // localStorage.setItem('UserID', JSON.stringify(response.data.UserID));
+        window.location.href = `/EventDetail/${HackathonID}`;
+      }
+      else{
+        Swal.fire({
+          title: "Good job!",
+          text: "Join team Sucessful!",
+          icon: "success"
+        });
+        setTimeout(() => {
+          Swal.close();
+        }, 3000);
+    
+        await new Promise(resolve => setTimeout(resolve, 2000));
+    
+        // localStorage.setItem('UserID', JSON.stringify(response.data.UserID));
+        window.location.href = `/EventDetail/${HackathonID}`;
+      
       const payloadt = {
             teamID: TeamID,
             userID: UserID,
             role: role
-    };
+            };
         console.log('Payload:', payloadt);
         await Axios.post('http://localhost:3000/team/addMember', payloadt);
         setuserTeamlist((prev) => [
             ...prev,
             { teamID: TeamID, userID: UserID, role: role },
         ]);
+      }
     } catch (error) {
         console.error("Error joining team:", error);
     }
-    Swal.fire({
-      title: "Good job!",
-      text: "Join team Sucessful!",
-      icon: "success"
-    });
-    setTimeout(() => {
-      Swal.close();
-    }, 3000);
-
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // localStorage.setItem('UserID', JSON.stringify(response.data.UserID));
-    window.location.href = `/EventDetail/${HackathonID}`;
+    
+  
 };
 
 
@@ -185,7 +205,7 @@ const addteam = async () => {
               </div>
               <h3 className="text-xl font-semibold text-gray-700 mt-8">Team {val.TeamName}</h3>
               <button
-                onClick={() => setIsjoinTeamModalOpen([true,val.TeamID])}
+                onClick={() => setIsjoinTeamModalOpen([true,val.TeamID,val.CurrentMember,val.MaxMember])}
                 className="absolute bottom-4 right-4 px-3 py-1 bg-gradient-to-r from-blue-400 to-blue-500 text-white font-semibold rounded-full shadow-md hover:from-blue-500 hover:to-blue-600 transition-transform transform hover:-translate-y-1 hover:scale-105"
               >
                 Join Team
@@ -198,7 +218,6 @@ const addteam = async () => {
         {isjoinTeamModalOpen[0] == true && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="w-full max-w-lg bg-gradient-to-b from-blue-500 to-sky-500 text-white rounded-lg p-6 shadow-lg">
-              <h1>{isjoinTeamModalOpen[1]}</h1>
               <h1 className="text-3xl font-bold text-center mb-6 ">Create New Team</h1>
               
               {/* role */}
@@ -222,7 +241,7 @@ const addteam = async () => {
                   </button>
                   <button
                     onClick={async () => {
-                      await jointeam(isjoinTeamModalOpen[1]);
+                      await jointeam(isjoinTeamModalOpen[1],isjoinTeamModalOpen[2],isjoinTeamModalOpen[3]);
                       setIsjoinTeamModalOpen(false);
 
                     }}
