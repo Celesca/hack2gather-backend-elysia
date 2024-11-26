@@ -243,7 +243,6 @@ function Navbar() {
                     โปรไฟล์
                   </a>
             
->>>>>>>>> Temporary merge branch 2
                   <button
                     onClick={handleLogout}
                     className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300"

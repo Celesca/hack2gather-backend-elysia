@@ -12,15 +12,13 @@ import Swipe from "./Swipe";
 import Register from "./Register";
 import LoginForm from "./LoginForm";
 import Profile from "./profile";
-<<<<<<<<< Temporary merge branch 1
 import EventDetail from './EventDetail';
 
 import Dashboard from "./Dashboard";
-=========
+
 import EventDetail from "./EventDetail";
 import Rating from "./Rating";
 
->>>>>>>>> Temporary merge branch 2
 import Hackathon from "./hackathon";
 import AllUsers from "./all_user";
 import Message from "./message";
