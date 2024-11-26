@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Menu, X, Bell } from 'lucide-react';
+import { Search, Menu, X, Bell, InboxIcon } from 'lucide-react';
 import axios from 'axios';
 
 function Navbar() {
@@ -131,6 +131,9 @@ function Navbar() {
             </a>
             {!isLoggedIn ? (
               <>
+                <a href="/about_us" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                  About us
+                </a>
                 <a href="/register" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                   Register
                 </a>
@@ -163,9 +166,12 @@ function Navbar() {
                 >
                   Logout
                 </button>
+                <NotificationBell />
+                <a href="/message" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                  <InboxIcon className="h-6 w-6" />
+                </a>
               </>
             )}
-            <NotificationBell />
           </div>
 
           <button
@@ -180,30 +186,33 @@ function Navbar() {
           <div className="md:hidden mt-4 bg-white/5 backdrop-blur-lg rounded-lg border border-white/10">
             <div className="flex flex-col space-y-2 p-4">
               <a href="/" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-                หน้าแรก
+                Home
               </a>
               {!isLoggedIn ? (
                 <>
+                  <a href="/about_us" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                    About us
+                  </a>
                   <a href="/register" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-                    สมัครสมาชิก
+                    Register
                   </a>
                   <a href="/login" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-                    เข้าสู่ระบบ
+                    Login
                   </a>
                 </>
               ) : (
                 <>
                   <a href="/profile" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-                    โปรไฟล์
+                    Profile
                   </a>
                   <a href="/EventDetail" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-                    กิจกรรม hackathon
+                    Event hackathon
                   </a>
                   <a href="/hackathon" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-                    รวม hackathon
+                    Hackathon
                   </a>
                   <a href="/swipe" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-                    จับคู่
+                    Match
                   </a>
                   {isAdmin && (
                     <a href="/dashboard" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
@@ -214,11 +223,14 @@ function Navbar() {
                     onClick={handleLogout}
                     className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300"
                   >
-                    ออกจากระบบ
+                    Logout
                   </button>
                 </>
               )}
               <NotificationBell />
+              <a href="/message" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                <InboxIcon className="h-6 w-6" />
+              </a>
             </div>
           </div>
         )}

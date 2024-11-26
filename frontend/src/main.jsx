@@ -17,6 +17,8 @@ import Personal from "./personal";
 import Dashboard from "./Dashboard";
 import Hackathon from "./hackathon";
 import AllUsers from "./all_user";
+import Message from "./message";
+import About_us from "./about_us";
 
 const router = createBrowserRouter([
   {
@@ -115,6 +117,26 @@ const router = createBrowserRouter([
       <>
         <Navbar />
         <AllUsers />
+      </>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "/message",
+    element: (
+      <>
+        <Navbar />
+        <Message />
+      </>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "/about_us",
+    element: (
+      <>
+        <Navbar />
+        <About_us />
       </>
     ),
     errorElement: <ErrorPage />
