@@ -136,6 +136,9 @@ function Navbar() {
                 <a href="/hackathon" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                   Hackathon
                 </a>
+                <a href="/Rating" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                  Rating
+                  </a>
                 <a href="/swipe" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                   Match
                 </a>
@@ -179,18 +182,25 @@ function Navbar() {
                 </>
               ) : (
                 <>
-                  <a href="/profile" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-                    โปรไฟล์
-                  </a>
-                  <a href="/EventDetail" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
-                    กิจกรรม hackathon
-                  </a>
-                  <a href="/hackathon" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                  <a href="/hackathon" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                     รวม hackathon
                   </a>
-                  <a href="/swipe" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                  <a href="/EventDetail" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                    กิจกรรม hackathon
+                  </a>
+                  <a href="/Rating" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                    Rating
+                  </a>
+                  <a href="/Personal" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                    personal Type
+                  </a>
+                  <a href="/swipe" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                     จับคู่
                   </a>
+                  <a href="/profile" className="text-white hover:text-purple-200 transition duration-300 font-medium">
+                    โปรไฟล์
+                  </a>
+            
                   <button
                     onClick={handleLogout}
                     className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300"
