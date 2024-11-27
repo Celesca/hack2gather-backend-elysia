@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Axios from 'axios';
+import Swal from 'sweetalert2'
 
 const Rating = () => {
   const [teams, setTeams] = useState([]);
@@ -72,7 +73,7 @@ const Rating = () => {
       }
 
       // // Store TeamID in local storage
-      // localStorage.setItem('TeamID', TeamID);
+      localStorage.setItem('TeamID', TeamID);
 
       // Fetch UserID from Username
       const userResponse = await Axios.get(`http://localhost:3000/user/getUserID/${selectedUser}`);
@@ -81,29 +82,33 @@ const Rating = () => {
 
       
       const ratedUserID = userResponse.data.UserID;
+
+
       
       if (!ratedUserID) {
         setErrorMessage('ไม่พบ UserID ของ Username นี้');
         return;
       }
 
+      console.log(ratedUserID)
+      console.log(UserID)
+
       // Check if the user is part of the team
       const checkTeam = await Axios.get(`http://localhost:3000/team/checkteam`, {
         params: {
           TeamID: TeamID,
-          UserID: ratedUserID,
+          UserID: UserID,
         },
       });
 
+
+ 
       if (!checkTeam.data.valid) {
-        setErrorMessage('คุณไม่ได้อยู่ทีมเดียวกัน กรุณาลองใหม่อีกครั้ง');
+        setErrorMessage('คุณไม่ได้เป็นสมาชิกของทีมนี้');
         return;
       }
 
-      console.log(UserID)
-      console.log(ratedUserID)
-      console.log(typeof RatingValue);
-      console.log(Comment)
+
 
       // Add rating
       await Axios.post(`http://localhost:3000/rating/rateuser`, {
@@ -125,10 +130,35 @@ const Rating = () => {
     setRatingValue('');
     setComment('');
     setErrorMessage('');
-    alert('บันทึกคะแนนสำเร็จ');
+
+    Swal.fire({
+      title: "Good job!",
+      text: " Add rating sucessfully!",
+      icon: "success"
+    });
+    setTimeout(() => {
+      Swal.close();
+    }, 3000);
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    window.location.href = '/Rating';
+    
+
   } catch (error) {
-    console.error('Error:', error);
-    setErrorMessage('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+    console.error('Error adding rating:', error);
+    Swal.fire({
+      title: "Error!",
+      text: "ํYou're not a member of this team!",
+      icon: "error"
+    });
+    setTimeout(() => {
+      Swal.close();
+    }, 3000);
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    window.location.href = '/Rating';
   }
   };
 
