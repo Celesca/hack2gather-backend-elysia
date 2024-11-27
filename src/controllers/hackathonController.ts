@@ -35,7 +35,7 @@ export const hackathonController = new Elysia({ prefix: "/hackathon" })
     // Create a new hackathon
     .post(
         "/create",
-        async ({ body: { name, description, location, startDate, endDate }, error }) => {
+        async ({ body: { name, description, location, startDate, endDate, hackathonImage }, error }) => {
         // Validate the input
         if (!name || !description || !location || !startDate || !endDate) {
             return error(400, "Name and description are required");
@@ -47,7 +47,8 @@ export const hackathonController = new Elysia({ prefix: "/hackathon" })
             Description: description,
             StartDate: startDate,
             EndDate: endDate,
-            Location: location, 
+            Location: location,
+            HackathonImage: hackathonImage,
             },
         });
     
@@ -60,6 +61,7 @@ export const hackathonController = new Elysia({ prefix: "/hackathon" })
             location: t.String(),
             startDate: t.String(),
             endDate: t.String(),
+            hackathonImage: t.String(),
         }),
         }
     )

@@ -12,13 +12,15 @@ import Swipe from "./Swipe";
 import Register from "./Register";
 import LoginForm from "./LoginForm";
 import Profile from "./profile";
-import EventDetail from './EventDetail';
-import Personal from "./personal";
+import EventDetail from "./EventDetail";
+import Rating from "./Rating";
+
 import Dashboard from "./Dashboard";
 import Hackathon from "./hackathon";
 import AllUsers from "./all_user";
 import Message from "./message";
 import About_us from "./about_us";
+import Add_hackathon from "./Add_Hackathon"
 
 const router = createBrowserRouter([
   {
@@ -72,7 +74,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />
   },
   {
-    path: "/EventDetail",
+    path: "/EventDetail/:HackathonID" ,
     element: (
       <>
         <Navbar />
@@ -92,11 +94,11 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />
   },
   {
-    path: "/Personal",
+    path: "/Rating",
     element: (
       <>
         <Navbar />
-        <Personal />
+        <Rating />
       </>
     ),
     errorElement: <ErrorPage />
@@ -137,6 +139,16 @@ const router = createBrowserRouter([
       <>
         <Navbar />
         <About_us />
+      </>
+    ),
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "/Add_hackathon",
+    element: (
+      <>
+        <Navbar />
+        <Add_hackathon />
       </>
     ),
     errorElement: <ErrorPage />

@@ -29,7 +29,7 @@ export const ratingController = new Elysia({ prefix: "/rating" })
 })
 
 // Rating to someone
-ratingController.post("/", async ({ body, error }) => {
+.post("/rateuser", async ({ body, error }) => {
     const { ratedByID, ratedUserID, ratingValue, comment } = body;
 
     // Check if the user exists
@@ -103,4 +103,4 @@ ratingController.post("/", async ({ body, error }) => {
         ratingValue: t.Optional(t.Number()),
         comment: t.Optional(t.String()),
     }),
-})
+});
