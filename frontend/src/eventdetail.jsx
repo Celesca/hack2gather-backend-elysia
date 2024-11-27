@@ -7,8 +7,10 @@ import Swal from 'sweetalert2'
 const EventDetail = () => {
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
   const [isjoinTeamModalOpen, setIsjoinTeamModalOpen] = useState([false,'']);
+  const [isleaveTeamModalOpen, setleaveTeamModalOpen] = useState([false,'']);
   const [Teamlist, setTeamlist] = useState([]);
   const [userTeamlist, setuserTeamlist] = useState([]);
+  const [member, setmember] = useState([]);
   const [teamName, setteamName] = useState('');
   const [maxMember, setmaxMember] = useState('');
   const [role,setrole] = useState('head');
@@ -16,10 +18,68 @@ const EventDetail = () => {
   console.log("HackathonID:", HackathonID);
   const [Hackathondetaillist, setHackathondetaillist] = useState([]);
   const UserID = localStorage.getItem('UserID')
+  const [currentUserRole, setCurrentUserRole] = useState('');
 
    useEffect(() => {
      console.log('Teamlist:', userTeamlist);
    }, [userTeamlist]);
+   useEffect(() => {
+    console.log('member:', member);
+  }, [member]);
+  
+  const deletefromteam = async (TeamID, UserID) => {
+    try {
+      const response = await Axios.delete(`http://localhost:3000/team/removeMember`, {
+        data: {
+          teamID: TeamID,
+          userID: UserID
+        }
+      });
+      console.log('Delete response:', response.data);
+      Swal.fire({
+        title: "Congratulation",
+        text: "Delete this member from team!",
+        icon: "success"
+      });
+      setTimeout(() => {
+        Swal.close();
+      }, 3000);
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      window.location.href = `/EventDetail/${HackathonID}`;
+    } catch (error) {
+      console.error("Error deleting from team:", error);
+    }
+  }
+
+  //list of members
+   const showmember = async (TeamID) => {
+    try {
+      const response = await Axios.get(`http://localhost:3000/team/finduserteam/${TeamID}`);
+      const teamMembers = response.data; // Assuming the response contains a list of members
+      console.log('Team members:', teamMembers);
+      const memberDetails = await Promise.all(teamMembers.map(async (member) => {
+        const res = await Axios.get(`http://localhost:3000/user/id/${member.UserID}`);
+        return {
+          teamID: TeamID,
+          userID: member.UserID,
+          userName: res.data.UserName,
+          role: member.Role
+        };
+      }));
+      
+      setmember(memberDetails);
+
+      const currentUser = memberDetails.find(member => member.userID === UserID);
+      if (currentUser) {
+        setCurrentUserRole(currentUser.role);
+      }
+      
+    } catch (error) {
+      console.error("Error fetching team members:", error);
+    }
+  };
 
   const jointeam = async (TeamID,CurrentMember,MaxMember) => {
     try {
@@ -70,7 +130,7 @@ const EventDetail = () => {
     }
     
   
-};
+  };
 
 
 const addteam = async () => {
@@ -204,17 +264,69 @@ const addteam = async () => {
                 <span>👥 {val.CurrentMember}/{val.MaxMember}</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-700 mt-8">Team {val.TeamName}</h3>
-              <button
-                onClick={() => setIsjoinTeamModalOpen([true,val.TeamID,val.CurrentMember,val.MaxMember])}
-                className="absolute bottom-4 right-4 px-3 py-1 bg-gradient-to-r from-blue-400 to-blue-500 text-white font-semibold rounded-full shadow-md hover:from-blue-500 hover:to-blue-600 transition-transform transform hover:-translate-y-1 hover:scale-105"
-              >
-                Join Team
-              </button>
+              <div className="absolute bottom-4 right-4 flex space-x-2">
+                <button
+                  onClick={async () => {
+                    await setleaveTeamModalOpen([true, val.TeamID])
+                    showmember(val.TeamID)
+                  }}
+                  className="px-3 py-1 bg-gradient-to-r from-red-400 to-red-500 text-white font-semibold rounded-full shadow-md hover:from-red-500 hover:to-red-600 transition-transform transform hover:-translate-y-1 hover:scale-105"
+                >
+                  Delete Member
+                </button>
+                <button
+                  onClick={() => setIsjoinTeamModalOpen([true, val.TeamID, val.CurrentMember, val.MaxMember])}
+                  className="px-3 py-1 bg-gradient-to-r from-blue-400 to-blue-500 text-white font-semibold rounded-full shadow-md hover:from-blue-500 hover:to-blue-600 transition-transform transform hover:-translate-y-1 hover:scale-105"
+                >
+                  Join Team
+                </button>
+              </div>
 
             </div>
           ))}
           
+        {/* leave team popup */}
+        {isleaveTeamModalOpen[0] == true && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="w-full max-w-lg bg-gradient-to-b from-blue-500 to-sky-500 text-white rounded-lg p-6 shadow-lg">
+              <h1 className="text-3xl font-bold text-center mb-6 ">Show member</h1>
+              
+              {member.filter(val => val.userID !== UserID).map((val,key) => (
+                <div key={key} className="flex justify-between items-center">
+                <div>
+                  <h3>{val.teamID}</h3>
+                  <p>UserID: {val.userID}</p>
+                  <p>Username: {val.userName}</p>
+                </div>
 
+                {currentUserRole === 'head' && (
+                  <button
+                    onClick={() => deletefromteam(val.teamID, val.userID)}
+                    className="px-3 py-1 bg-gradient-to-r from-red-400 to-red-500 text-white font-semibold rounded-full shadow-md hover:from-red-500 hover:to-red-600 transition-transform transform hover:-translate-y-1 hover:scale-105"
+                  >
+                    Remove
+                  </button>
+                )}
+
+              </div>
+            ))}
+              
+              {/* Buttons */}
+              
+                <div className="flex justify-between mt-6">
+                  <button
+                    onClick={() => setleaveTeamModalOpen(false)}
+                    className="w-1/3 h-12 bg-gray-300 text-black font-bold rounded-full shadow-md hover:bg-gray-400 transition duration-300"
+                  >
+                    Cancel
+                  </button>
+                  
+                </div>
+            </div>
+          </div>
+        )}  
+        
+        {/* jointeam popup */}
         {isjoinTeamModalOpen[0] == true && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="w-full max-w-lg bg-gradient-to-b from-blue-500 to-sky-500 text-white rounded-lg p-6 shadow-lg">

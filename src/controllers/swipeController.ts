@@ -4,31 +4,31 @@ import { prisma } from "../prisma";
 // Controller for handling swipe-related routes
 export const swipeController = new Elysia({ prefix: "/swipe" })
 
-  // Fetch a profile to swipe on
+  // Fetch all profiles to swipe on except the current user
   .get(
     "/:userID",
     async ({ params: { userID }, error }) => {
-      // Fetch a user that the current user hasn't swiped on yet
-      const potentialMatch = await prisma.user.findFirst({
+      // Fetch all users except the current user
+      const potentialMatches = await prisma.user.findMany({
         where: {
-          // Avoid users the current user has already swiped on
-          SwipesReceived: {
-            none: {
-              SwipingUserID: userID,
-            },
-          },
           UserID: {
             not: userID, // Exclude the current user
           },
         },
-        // You can add more complex logic here for filtering based on working style, location, etc.
+        include: {
+          UserSkills: {
+            include: {
+              Skill: true,
+            },
+          },
+        },
       });
 
-      if (!potentialMatch) {
+      if (potentialMatches.length === 0) {
         return error(404, "No more profiles available to swipe");
       }
 
-      return potentialMatch; // Return the profile for swiping
+      return potentialMatches; // Return the profiles for swiping
     },
     {
       params: t.Object({
@@ -78,7 +78,7 @@ export const swipeController = new Elysia({ prefix: "/swipe" })
                 NotificationContent: `You have a new match with ${userID}!`,
               },
             ],
-          })
+          });
 
           await prisma.message.createMany({
             data: [

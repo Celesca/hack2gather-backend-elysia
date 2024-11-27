@@ -50,8 +50,8 @@ function Navbar() {
 
   const markAsRead = async (notificationID) => {
     try {
-      const userID = localStorage.getItem('UserID');
-      await axios.put(`http://localhost:3000/noti/${userID}/unread`, { ReadStatus: true });
+      // const userID = localStorage.getItem('UserID');
+      await axios.put(`http://localhost:3000/noti/${notificationID}`, { ReadStatus: true });
       setNotifications((prev) =>
         prev.filter((notification) => notification.NotificationID !== notificationID)
       );
@@ -146,15 +146,12 @@ function Navbar() {
                 <a href="/profile" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                   Profile
                 </a>
-                <a href="/EventDetail" className="text-white hover:text-purple-200 transition duration-300 font-medium">
-                  Event hackathon
-                </a>
                 <a href="/hackathon" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                   Hackathon
                 </a>
                 <a href="/Rating" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                   Rating
-                  </a>
+                </a>
                 <a href="/swipe" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                   Match
                 </a>
@@ -223,7 +220,7 @@ function Navbar() {
                       Dashboard
                     </a>
                   )}
-=========
+
                   <a href="/hackathon" className="text-white hover:text-purple-200 transition duration-300 font-medium">
                     รวม hackathon
                   </a>
@@ -243,6 +240,25 @@ function Navbar() {
                     โปรไฟล์
                   </a>
             
+
+                  <a href="/profile" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                    Profile
+                  </a>
+                  <a href="/EventDetail" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                    Event hackathon
+                  </a>
+                  <a href="/hackathon" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                    Hackathon
+                  </a>
+                  <a href="/swipe" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                    Match
+                  </a>
+                  {isAdmin && (
+                    <a href="/dashboard" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
+                      Dashboard
+                    </a>
+                  )}
+
                   <button
                     onClick={handleLogout}
                     className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300"

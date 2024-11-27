@@ -74,6 +74,28 @@ export const teamController = new Elysia({ prefix: "/team" })
         TeamName: t.String(),
     }),
   })
+.get("/finduserteam/:teamID", async ({ params, error }) => {
+    const teamID = parseInt(params.teamID, 10); // Ensure teamID is a number
+    if (isNaN(teamID)) {
+        return error(400, "Invalid teamID");
+    }
+
+    const team = await prisma.userTeam.findMany({
+        where: {
+            TeamID: teamID,
+        },
+    });
+
+    if (!team || team.length === 0) {
+        return error(404, "Team not found");
+    }
+
+    return team;
+}, {
+    params: t.Object({
+        teamID: t.String(), // teamID is a string in the URL params
+    }),
+})
 
 .get("/hackathon/:id", async ({ params: { id }, error }) => {
     const teams = await prisma.team.findMany({
@@ -97,7 +119,7 @@ export const teamController = new Elysia({ prefix: "/team" })
 
 .post("/create", async ({ body, error }) => {
     const { teamName, hackathonID, maxMember } = body;
-
+    console.log('Creating team with:', { teamName, hackathonID, maxMember });
     // Check if team and hackathonID exists
     const hackathon = await prisma.hackathon.findUnique({
         where: { HackathonID: hackathonID },
