@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import Axios from 'axios';
 
 const Rating = () => {
-  const [TeamName, setTeamname] = useState('');
-  const [UserName, setUsername] = useState('');
+  const [teams, setTeams] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState('');
+  const [selectedUser, setSelectedUser] = useState('');
   const [RatingValue, setRatingValue] = useState('');
   const [Comment, setComment] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -16,7 +18,34 @@ const Rating = () => {
     } else {
       console.warn('UserID not found in localStorage');
     }
+
+    const fetchTeams = async () => {
+      try {
+        const response = await Axios.get('http://localhost:3000/team');
+        setTeams(response.data);
+      } catch (error) {
+        console.error('Error fetching teams:', error);
+      }
+    };
+
+    fetchTeams();
   }, []);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (selectedTeam) {
+        try {
+          const response = await Axios.get(`http://localhost:3000/team/users/${selectedTeam}`);
+          setUsers(response.data);
+        } catch (error) {
+          console.error('Error fetching users:', error);
+        }
+      }
+      console.log(selectedTeam)
+    };
+
+    fetchUsers();
+  }, [selectedTeam]);
 
   const addrating = async () => {
     try {
@@ -30,22 +59,40 @@ const Rating = () => {
         return;
       }
 
-      // ดึง UserID จาก Username ที่กรอก
-      const userResponse = await Axios.get(`http://localhost:3000/user/UserID`, {
-        params: { username: UserName },
+      // Fetch TeamID from TeamName
+      const teamResponse = await Axios.get(`http://localhost:3000/team/getTeam`, {
+        params: { TeamID: selectedTeam },
       });
 
-      const ratedUserID = userResponse.data.userID;
+      const TeamID = teamResponse.data.TeamID;
 
+      if (!TeamID) {
+        setErrorMessage('ไม่พบ TeamID ของทีมนี้');
+        return;
+      }
+
+      // // Store TeamID in local storage
+      // localStorage.setItem('TeamID', TeamID);
+
+      // Fetch UserID from Username
+      const userResponse = await Axios.get(`http://localhost:3000/user/getUserID/${selectedUser}`);
+
+      console.log(userResponse.data);
+
+      
+      const ratedUserID = userResponse.data.UserID;
+      
       if (!ratedUserID) {
         setErrorMessage('ไม่พบ UserID ของ Username นี้');
         return;
       }
 
-      // ตรวจสอบว่า UserID ของ Username ที่กรอกอยู่ในทีมมั้ย
-      const checkTeam = await Axios.post(`http://localhost:3000/team`, {
-        teamname: TeamName,
-        userid: ratedUserID, // ตรวจสอบ UserID นี้ในทีม
+      // Check if the user is part of the team
+      const checkTeam = await Axios.get(`http://localhost:3000/team/checkteam`, {
+        params: {
+          TeamID: TeamID,
+          UserID: ratedUserID,
+        },
       });
 
       if (!checkTeam.data.valid) {
@@ -53,50 +100,37 @@ const Rating = () => {
         return;
       }
 
-      // เพิ่ม ratedUserID ลงในตาราง userteam
-      await Axios.post(
-        `http://localhost:3000/userteam`,
-        {
-          teamname: TeamName,
-          ratedUserID, // UserID ของผู้ที่ได้รับคะแนน
-          rateByID: UserID, // UserID ของผู้ให้คะแนน
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      );
+      console.log(UserID)
+      console.log(ratedUserID)
+      console.log(RatingValue)
+      console.log(Comment)
 
-      // add คะแนนลง userrating
-      await Axios.post(
-        `http://localhost:3000/userrating`,
-        {
-          TeamName,
-          UserName,
-          RatingValue: parseInt(RatingValue),
-          Comment,
-          ratedUserID,
-          rateByID: UserID,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+      // Add rating
+           // Add rating
+           await Axios.post(`http://localhost:3000/rating/rateuser`, {
+            ratedByID: UserID,
+            ratedUserID: ratedUserID,
+            ratingValue: RatingValue,
+            comment: Comment,
           },
-        }
-      );
-
-      // รีเซ็ตฟอร์ม
-      setTeamname('');
-      setUsername('');
-      setRatingValue('');
-      setComment('');
-      setErrorMessage('');
-      alert('บันทึกคะแนนสำเร็จ');
-    } catch (error) {
-      console.error('Error:', error);
-      setErrorMessage('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-    }
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        );
+  
+        // Reset form
+        setSelectedTeam('');
+        setSelectedUser('');
+        setRatingValue('');
+        setComment('');
+        setErrorMessage('');
+        alert('บันทึกคะแนนสำเร็จ');
+      } catch (error) {
+        console.error('Error:', error);
+        setErrorMessage('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+      }
   };
 
   return (
@@ -108,20 +142,30 @@ const Rating = () => {
 
         <div className="p-6 space-y-6">
           <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="Enter Team Name"
-              value={TeamName}
-              onChange={(event) => setTeamname(event.target.value)}
+            <select
+              value={selectedTeam}
+              onChange={(event) => setSelectedTeam(event.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <input
-              type="text"
-              placeholder="Enter Username"
-              value={UserName}
-              onChange={(event) => setUsername(event.target.value)}
+            >
+              <option value="" disabled>Select Team</option>
+              {teams.map((team) => (
+                <option key={team.TeamID} value={team.TeamID}>
+                  {team.TeamName}
+                </option>
+              ))}
+            </select>
+            <select
+              value={selectedUser}
+              onChange={(event) => setSelectedUser(event.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            >
+              <option value="" disabled>Select User</option>
+              {users.map((user) => (
+                <option key={user.UserID} value={user.UserID}>
+                  {user.UserName}
+                </option>
+              ))}
+            </select>
             <input
               type="number"
               placeholder="Enter a score as an integer from 1 to 5"
