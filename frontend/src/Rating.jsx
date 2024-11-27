@@ -30,9 +30,21 @@ const Rating = () => {
         return;
       }
 
-      // ดึง UserID จาก Username ที่กรอก
-      const userResponse = await Axios.get(`http://localhost:3000/user/UserID`, {
-        params: { username: UserName },
+      // ดึง TeamID จาก TeamName
+      const teamResponse = await Axios.get(`http://localhost:3000/team/getTeamID`, {
+        params: { TeamName: TeamName },
+      });
+
+      const TeamID = teamResponse.data.TeamID;
+
+      if (!TeamID) {
+        setErrorMessage('ไม่พบ TeamID ของทีมนี้');
+        return;
+      }
+
+      // ดึง UserID จาก Username 
+      const userResponse = await Axios.get(`http://localhost:3000/user/getUserID`, {
+        params: { Username: UserName },
       });
 
       const ratedUserID = userResponse.data.userID;
@@ -42,10 +54,10 @@ const Rating = () => {
         return;
       }
 
-      // ตรวจสอบว่า UserID ของ Username ที่กรอกอยู่ในทีมมั้ย
-      const checkTeam = await Axios.post(`http://localhost:3000/team`, {
-        teamname: TeamName,
-        userid: ratedUserID, // ตรวจสอบ UserID นี้ในทีม
+      // ตรวจสอบว่าคนให้คะแนนอยู่ในทีมเดียวกันคนถูกให้คะแนนมั้ย
+      const checkTeam = await Axios.post(`http://localhost:3000/team/checkteam`, {
+        Teamname: TeamName,
+        userID: ratedUserID, // ตรวจสอบ UserID ในทีม
       });
 
       if (!checkTeam.data.valid) {
@@ -53,31 +65,12 @@ const Rating = () => {
         return;
       }
 
-      // เพิ่ม ratedUserID ลงในตาราง userteam
-      await Axios.post(
-        `http://localhost:3000/userteam`,
-        {
-          teamname: TeamName,
-          ratedUserID, // UserID ของผู้ที่ได้รับคะแนน
-          rateByID: UserID, // UserID ของผู้ให้คะแนน
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      );
-
-      // add คะแนนลง userrating
-      await Axios.post(
-        `http://localhost:3000/userrating`,
-        {
-          TeamName,
-          UserName,
-          RatingValue: parseInt(RatingValue),
-          Comment,
+      // เพิ่มข้อมูลลงในตาราง userteam
+      await Axios.post(`http://localhost:3000/rating/rateuser`, {
+          ratedByID: UserID,
           ratedUserID,
-          rateByID: UserID,
+          RatingValue: RatingValue,
+          Comment,
         },
         {
           headers: {

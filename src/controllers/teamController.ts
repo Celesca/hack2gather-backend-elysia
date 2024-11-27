@@ -29,6 +29,52 @@ export const teamController = new Elysia({ prefix: "/team" })
     }),
 })
 
+// check TeamName and UserID in rating
+.get("/checkteam", async ({ query: { TeamID, userID }, error }) => {
+      // ตรวจสอบ input ว่ามีค่าหรือไม่
+      if (!TeamID || !userID) {
+        return error(400, "teamID and userID are required");
+      }
+
+      const teamMember = await prisma.userTeam.findFirst({
+        where: {
+          TeamID: TeamID,
+          UserID: userID,
+        },
+      });
+
+      if (!teamMember) {
+        return error(404, "User is not part of the team");
+      }
+
+      return "User is part of the team";
+    },
+    {
+      query: t.Object({
+        TeamID: t.Number(),
+        userID: t.String(),
+      }),
+    })
+
+// Get TeamID from TeamName
+.get("/getTeamID", async ({ query: { TeamName }, error }) => {
+    const team = await prisma.team.findFirst({
+        where: {
+          TeamName: TeamName,
+        },
+    });
+
+    if (!team) {
+        return error(404, "Team not found");
+    }
+
+    return {TeamID: team.TeamID};
+  }, {
+    query: t.Object({
+        TeamName: t.String(),
+    }),
+  })
+
 .get("/hackathon/:id", async ({ params: { id }, error }) => {
     const teams = await prisma.team.findMany({
         where: {

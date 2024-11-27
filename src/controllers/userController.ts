@@ -255,6 +255,25 @@ export const userController = new Elysia({ prefix: "/user" })
       return users; // Return all users with related skills and notifications
     })
 
+  // Get UserID from Username
+  .get("/getUserID", async ({ query: { UserName }, error }) => {
+    const user = await prisma.user.findFirst({
+        where: {
+          UserName: UserName,
+        },
+    });
+  
+    if (!user) {
+        return error(404, "User not found");
+    }
+  
+    return {userID: user.UserID};
+    }, {
+    query: t.Object({
+        UserName: t.String(),
+      }),
+    })
+
   // Delete user profile
   .delete(
     "/:userID",

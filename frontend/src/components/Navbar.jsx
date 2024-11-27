@@ -205,7 +205,7 @@ function Navbar() {
                 </>
               ) : (
                 <>
-<<<<<<<<< Temporary merge branch 1
+
                   <a href="/profile" className="text-white hover:bg-white/10 px-4 py-2 rounded-lg transition duration-300">
                     Profile
                   </a>
