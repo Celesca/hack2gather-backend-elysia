@@ -29,6 +29,26 @@ export const teamController = new Elysia({ prefix: "/team" })
     }),
 })
 
+.get("/findteambyuser/:userID", async ({ params, error }) => {
+
+    const team = await prisma.userTeam.findMany({
+        where: {
+            UserID: params.userID,
+        },
+    });
+
+    if (!team || team.length === 0) {
+        return error(404, "Team not found");
+    }
+
+    return team;
+}, {
+    params: t.Object({
+        userID: t.String(), // userID is a string in the URL params
+    }),
+})
+
+
 .get("/finduserteam/:teamID", async ({ params, error }) => {
     const teamID = parseInt(params.teamID, 10); // Ensure teamID is a number
     if (isNaN(teamID)) {
@@ -132,19 +152,40 @@ export const teamController = new Elysia({ prefix: "/team" })
     }),
 })
 
-.delete("/delete/:teamID", async ({ params, error }) => {
+.delete('/delete/:teamID', async ({ params, error }) => {
     const { teamID } = params;
-
-    const team = await prisma.team.delete({
-        where: { TeamID: teamID },
-    });
-
-    return team;
-}, {
+  
+    try {
+      const teamIDNumber = parseInt(teamID, 10); // Ensure teamID is a number
+      if (isNaN(teamIDNumber)) {
+        return error(400, 'Invalid teamID');
+      }
+  
+      const team = await prisma.team.findUnique({
+        where: { TeamID: teamIDNumber },
+      });
+      
+  
+      if (!team) {
+        return error(404, 'Team not found');
+      }
+      await prisma.userTeam.deleteMany({
+        where: { TeamID: teamIDNumber },
+      })
+      await prisma.team.delete({
+        where: { TeamID: teamIDNumber },
+      });
+  
+      return { message: 'Team deleted successfully' };
+    } catch (err) {
+      console.error('Error deleting team:', err);
+      return error(500, 'Internal Server Error');
+    }
+  }, {
     params: t.Object({
-        teamID: t.Number(),
+      teamID: t.String(), // teamID is a string in the URL params
     }),
-})
+  })
 
 .post("/addMember", async ({ body, error }) => {
     const { teamID, userID, role } = body;
