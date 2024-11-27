@@ -8,7 +8,25 @@ export const teamController = new Elysia({ prefix: "/team" })
     return teams;
 })
 
-// Get users in a team
+
+.get("/getTeam", async ({ query: { TeamID }, error }) => {
+    const team = await prisma.team.findFirst({
+        where: {
+          TeamID: TeamID,
+        },
+    });
+
+    if (!team) {
+        return error(404, "Team not found");
+    }
+
+    return team;
+}, {
+    query: t.Object({
+        TeamID: t.Number(),
+    }),
+})
+
 .get("/users/:teamID", async ({ params: { teamID }, error }) => {
     const users = await prisma.userTeam.findMany({
         where: {
@@ -30,11 +48,12 @@ export const teamController = new Elysia({ prefix: "/team" })
     }),
 })
 
-// Get Team by TeamID
-.get("/getTeam", async ({ query: { TeamID }, error }) => {
+// Get TeamID from name and hackathon
+.get("/find", async ({ query: { teamName, hackathonID }, error }) => {
     const team = await prisma.team.findFirst({
         where: {
-          TeamID: TeamID,
+            TeamName: teamName,
+            HackathonID: hackathonID,
         },
     });
 
@@ -45,7 +64,8 @@ export const teamController = new Elysia({ prefix: "/team" })
     return team;
 }, {
     query: t.Object({
-        TeamID: t.Number(),
+        teamName: t.String(),
+        hackathonID: t.Number(),
     }),
 })
 
