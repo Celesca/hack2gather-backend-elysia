@@ -26,7 +26,74 @@ const EventDetail = () => {
    useEffect(() => {
     console.log('member:', member);
   }, [member]);
+
+  const checkteam = async (TeamID) => {
+    try {
+      const responsed = await Axios.get(`http://localhost:3000/team/finduserteam/${TeamID}`);
+      const team = responsed.data;
+      const currentUser = team.find(member => member.UserID === UserID);
+      if (currentUser) {
+        Swal.fire({
+          title: "Sorry",
+          text: "You are in the team !",
+          icon: "error"
+        });
+        setTimeout(() => {
+          Swal.close();
+        }, 3000);
   
+        await new Promise(resolve => setTimeout(resolve, 2000));
+  
+        window.location.href = `/EventDetail/${HackathonID}`;}
+    } catch (error) {
+      console.error("Error deleting from team:", error);
+    }
+  }
+
+
+  const deleteteam = async (TeamID) => {
+    try {
+      const responsed = await Axios.get(`http://localhost:3000/team/finduserteam/${TeamID}`);
+      const team = responsed.data;
+      const currentUser = team.find(member => member.UserID === UserID);
+      if (currentUser) {
+         setCurrentUserRole(currentUser.role)}
+      
+      if (currentUserRole === 'head'){
+      const response = await Axios.delete(`http://localhost:3000/team/delete/${TeamID}`,TeamID);
+      console.log('Delete response:', response.data);
+      Swal.fire({
+        title: "Congratulation",
+        text: "Delete team success !",
+        icon: "success"
+      });
+      setTimeout(() => {
+        Swal.close();
+      }, 3000);
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      window.location.href = `/EventDetail/${HackathonID}`;
+    }
+    else{
+      Swal.fire({
+        title: "Sorry",
+        text: "You don't have permission to delete team !",
+        icon: "error"
+      });
+      setTimeout(() => {
+        Swal.close();
+      }, 3000);
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      window.location.href = `/EventDetail/${HackathonID}`;
+    }} catch (error) {
+      console.error("Error deleting from team:", error);
+    }
+  }
+
+  //delete members from team
   const deletefromteam = async (TeamID, UserID) => {
     try {
       const response = await Axios.delete(`http://localhost:3000/team/removeMember`, {
@@ -43,9 +110,9 @@ const EventDetail = () => {
       });
       setTimeout(() => {
         Swal.close();
-      }, 3000);
+      }, 1000);
 
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       window.location.href = `/EventDetail/${HackathonID}`;
     } catch (error) {
@@ -99,6 +166,19 @@ const EventDetail = () => {
         window.location.href = `/EventDetail/${HackathonID}`;
       }
       else{
+        
+      const payloadt = {
+            teamID: TeamID,
+            userID: UserID,
+            role: role
+            };
+        console.log('Payload:', payloadt);
+        await Axios.post('http://localhost:3000/team/addMember', payloadt);
+        setuserTeamlist((prev) => [
+            ...prev,
+            { teamID: TeamID, userID: UserID, role: role },
+        ]);
+
         Swal.fire({
           title: "Good job!",
           text: "Join team Sucessful!",
@@ -112,18 +192,6 @@ const EventDetail = () => {
     
         // localStorage.setItem('UserID', JSON.stringify(response.data.UserID));
         window.location.href = `/EventDetail/${HackathonID}`;
-      
-      const payloadt = {
-            teamID: TeamID,
-            userID: UserID,
-            role: role
-            };
-        console.log('Payload:', payloadt);
-        await Axios.post('http://localhost:3000/team/addMember', payloadt);
-        setuserTeamlist((prev) => [
-            ...prev,
-            { teamID: TeamID, userID: UserID, role: role },
-        ]);
       }
     } catch (error) {
         console.error("Error joining team:", error);
@@ -166,6 +234,18 @@ const addteam = async () => {
       ]);
 
       console.log('Team created successfully');
+      Swal.fire({
+        title: "Congratulation",
+        text: "Create team success !",
+        icon: "success"
+      });
+      setTimeout(() => {
+        Swal.close();
+      }, 3000);
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      window.location.href = `/EventDetail/${HackathonID}`;
   } catch (error) {
       console.error('Error creating team:', error.response?.data || error.message);
   }
@@ -264,6 +344,19 @@ const addteam = async () => {
                 <span>👥 {val.CurrentMember}/{val.MaxMember}</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-700 mt-8">Team {val.TeamName}</h3>
+
+               
+              <div className="absolute top-4 right-4">
+                <button
+                  onClick={() => deleteteam(val.TeamID)}
+                  className="ml-2 bg-red-500/80 text-white rounded-full p-1.5
+                           hover:bg-red-600 transition-all duration-300 transform hover:rotate-180"
+                >
+                  ✖
+                </button>
+              </div>
+              
+
               <div className="absolute bottom-4 right-4 flex space-x-2">
                 <button
                   onClick={async () => {
@@ -274,8 +367,12 @@ const addteam = async () => {
                 >
                   Delete Member
                 </button>
+
                 <button
-                  onClick={() => setIsjoinTeamModalOpen([true, val.TeamID, val.CurrentMember, val.MaxMember])}
+                  onClick={async () => {
+                    await setIsjoinTeamModalOpen([true, val.TeamID, val.CurrentMember, val.MaxMember])
+                    checkteam(val.TeamID)
+                  }}
                   className="px-3 py-1 bg-gradient-to-r from-blue-400 to-blue-500 text-white font-semibold rounded-full shadow-md hover:from-blue-500 hover:to-blue-600 transition-transform transform hover:-translate-y-1 hover:scale-105"
                 >
                   Join Team

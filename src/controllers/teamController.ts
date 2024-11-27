@@ -8,45 +8,92 @@ export const teamController = new Elysia({ prefix: "/team" })
     return teams;
 })
 
+// Get users in a team
+.get("/users/:teamID", async ({ params: { teamID }, error }) => {
+    const users = await prisma.userTeam.findMany({
+        where: {
+            TeamID: parseInt(teamID, 10),
+        },
+        include: {
+            User: true,
+        },
+    });
 
+    if (!users || users.length === 0) {
+        return error(404, "Users not found");
+    }
 
+    return users.map(userTeam => userTeam.User);
+}, {
+    params: t.Object({
+        teamID: t.String(),
+    }),
+})
 
+// Get Team by TeamID
+.get("/getTeam", async ({ query: { TeamID }, error }) => {
+    const team = await prisma.team.findFirst({
+        where: {
+          TeamID: TeamID,
+        },
+    });
 
+    if (!team) {
+        return error(404, "Team not found");
+    }
+
+    return team;
+}, {
+    query: t.Object({
+        TeamID: t.Number(),
+    }),
+})
+
+// Check if a user is part of a team
+.get("/checkteam", async ({ query: { TeamID, UserID }, error }) => {
+    if (!TeamID || !UserID) {
+        return error(400, "TeamID and UserID are required");
+    }
+
+    const teamMember = await prisma.userTeam.findFirst({
+        where: {
+            TeamID: TeamID,
+            UserID: UserID,
+        },
+    });
+
+    if (!teamMember) {
+        return error(404, "User is not part of the team");
+    }
+
+    return { valid: true };
+}, {
+    query: t.Object({
+        TeamID: t.Number(),
+        UserID: t.String(),
+    }),
+})
+
+// Other endpoints...
+// Get TeamID from TeamName
+.get("/getTeamID", async ({ query: { TeamName }, error }) => {
+    const team = await prisma.team.findFirst({
+        where: {
+            TeamName: TeamName,
+        },
+    });
+
+    if (!team) {
+        return error(404, "Team not found");
+    }
+
+    return {TeamID: team.TeamID};
+  }, {
+    query: t.Object({
+        TeamName: t.String(),
+    }),
+  })
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .get("/finduserteam/:teamID", async ({ params, error }) => {
     const teamID = parseInt(params.teamID, 10); // Ensure teamID is a number
     if (isNaN(teamID)) {
@@ -261,90 +308,3 @@ export const teamController = new Elysia({ prefix: "/team" })
         userID: t.String(),
     }),
 })
-
-
-// Get users in a team
-.get("/users/:teamID", async ({ params: { teamID }, error }) => {
-    const users = await prisma.userTeam.findMany({
-        where: {
-            TeamID: parseInt(teamID, 10),
-        },
-        include: {
-            User: true,
-        },
-    });
-
-    if (!users || users.length === 0) {
-        return error(404, "Users not found");
-    }
-
-    return users.map(userTeam => userTeam.User);
-}, {
-    params: t.Object({
-        teamID: t.String(),
-    }),
-})
-
-// Get Team by TeamID
-.get("/getTeam", async ({ query: { TeamID }, error }) => {
-    const team = await prisma.team.findFirst({
-        where: {
-          TeamID: TeamID,
-        },
-    });
-
-    if (!team) {
-        return error(404, "Team not found");
-    }
-
-    return team;
-}, {
-    query: t.Object({
-        TeamID: t.Number(),
-    }),
-})
-
-// Check if a user is part of a team
-.get("/checkteam", async ({ query: { TeamID, UserID }, error }) => {
-    if (!TeamID || !UserID) {
-        return error(400, "TeamID and UserID are required");
-    }
-
-    const teamMember = await prisma.userTeam.findFirst({
-        where: {
-            TeamID: TeamID,
-            UserID: UserID,
-        },
-    });
-
-    if (!teamMember) {
-        return error(404, "User is not part of the team");
-    }
-
-    return { valid: true };
-}, {
-    query: t.Object({
-        TeamID: t.Number(),
-        UserID: t.String(),
-    }),
-})
-
-// Other endpoints...
-// Get TeamID from TeamName
-.get("/getTeamID", async ({ query: { TeamName }, error }) => {
-    const team = await prisma.team.findFirst({
-        where: {
-            TeamName: TeamName,
-        },
-    });
-
-    if (!team) {
-        return error(404, "Team not found");
-    }
-
-    return {TeamID: team.TeamID};
-  }, {
-    query: t.Object({
-        TeamName: t.String(),
-    }),
-  })
