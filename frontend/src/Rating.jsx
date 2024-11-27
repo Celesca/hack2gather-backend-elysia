@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import Axios from 'axios';
 
 const Rating = () => {
-  const [TeamName, setTeamname] = useState('');
-  const [UserName, setUsername] = useState('');
+  const [teams, setTeams] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState('');
+  const [selectedUser, setSelectedUser] = useState('');
   const [RatingValue, setRatingValue] = useState('');
   const [Comment, setComment] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -16,7 +18,33 @@ const Rating = () => {
     } else {
       console.warn('UserID not found in localStorage');
     }
+
+    const fetchTeams = async () => {
+      try {
+        const response = await Axios.get('http://localhost:3000/team');
+        setTeams(response.data);
+      } catch (error) {
+        console.error('Error fetching teams:', error);
+      }
+    };
+
+    fetchTeams();
   }, []);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (selectedTeam) {
+        try {
+          const response = await Axios.get(`http://localhost:3000/team/users/${selectedTeam}`);
+          setUsers(response.data);
+        } catch (error) {
+          console.error('Error fetching users:', error);
+        }
+      }
+    };
+
+    fetchUsers();
+  }, [selectedTeam]);
 
   const addrating = async () => {
     try {
@@ -32,7 +60,7 @@ const Rating = () => {
 
       // ดึง TeamID จาก TeamName
       const teamResponse = await Axios.get(`http://localhost:3000/team/getTeamID`, {
-        params: { TeamName: TeamName },
+        params: { TeamName: selectedTeam },
       });
 
       const TeamID = teamResponse.data.TeamID;
@@ -44,7 +72,7 @@ const Rating = () => {
 
       // ดึง UserID จาก Username 
       const userResponse = await Axios.get(`http://localhost:3000/user/getUserID`, {
-        params: { Username: UserName },
+        params: { Username: selectedUser },
       });
 
       const ratedUserID = userResponse.data.userID;
@@ -56,7 +84,7 @@ const Rating = () => {
 
       // ตรวจสอบว่าคนให้คะแนนอยู่ในทีมเดียวกันคนถูกให้คะแนนมั้ย
       const checkTeam = await Axios.post(`http://localhost:3000/team/checkteam`, {
-        Teamname: TeamName,
+        Teamname: selectedTeam,
         userID: ratedUserID, // ตรวจสอบ UserID ในทีม
       });
 
@@ -80,8 +108,8 @@ const Rating = () => {
       );
 
       // รีเซ็ตฟอร์ม
-      setTeamname('');
-      setUsername('');
+      setSelectedTeam('');
+      setSelectedUser('');
       setRatingValue('');
       setComment('');
       setErrorMessage('');
@@ -101,20 +129,30 @@ const Rating = () => {
 
         <div className="p-6 space-y-6">
           <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="Enter Team Name"
-              value={TeamName}
-              onChange={(event) => setTeamname(event.target.value)}
+            <select
+              value={selectedTeam}
+              onChange={(event) => setSelectedTeam(event.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <input
-              type="text"
-              placeholder="Enter Username"
-              value={UserName}
-              onChange={(event) => setUsername(event.target.value)}
+            >
+              <option value="" disabled>Select Team</option>
+              {teams.map((team) => (
+                <option key={team.TeamID} value={team.TeamID}>
+                  {team.TeamName}
+                </option>
+              ))}
+            </select>
+            <select
+              value={selectedUser}
+              onChange={(event) => setSelectedUser(event.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            >
+              <option value="" disabled>Select User</option>
+              {users.map((user) => (
+                <option key={user.UserID} value={user.UserName}>
+                  {user.UserName}
+                </option>
+              ))}
+            </select>
             <input
               type="number"
               placeholder="Enter a score as an integer from 1 to 5"
