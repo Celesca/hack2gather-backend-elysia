@@ -113,7 +113,7 @@ const Swipe = () => {
   const rotation = dragDelta.x / 20;
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-blue-200 bg-opacity-75">
       {/* Header */}
       <div className="bg-blue-900 text-white p-4">
         <div className="max-w-4xl mx-auto flex justify-between items-center">

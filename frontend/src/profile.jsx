@@ -4,7 +4,7 @@ import { MdEmail } from "react-icons/md";
 import Axios from 'axios';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2'
-import image from '../../public/uploads/profiles/5psgeommk-b1715b66-2c24-49ee-b16e-37ab0ba43ea0.jpeg' 
+// import image from '../../public/uploads/profiles/5psgeommk-b1715b66-2c24-49ee-b16e-37ab0ba43ea0.jpeg' 
 
 // EditProfileModal component
 const EditProfileModal = ({ isOpen, onClose, onSave, user }) => {
@@ -566,7 +566,7 @@ const Profile = () => {
                             flex items-center justify-center overflow-hidden">
                 {user.ProfileImage ? (
                   <img 
-                    src={image}
+                    src={user.ProfileImage}
                     alt="Profile" 
                     className="w-full h-full object-cover rounded-lg 
                               transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-3"
