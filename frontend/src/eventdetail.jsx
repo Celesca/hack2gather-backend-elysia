@@ -8,6 +8,7 @@ const EventDetail = () => {
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
   const [isjoinTeamModalOpen, setIsjoinTeamModalOpen] = useState([false,'']);
   const [isleaveTeamModalOpen, setleaveTeamModalOpen] = useState([false,'']);
+  const [isshowTeamModalOpen, setshowTeamModalOpen] = useState([false,'']);
   const [Teamlist, setTeamlist] = useState([]);
   const [userTeamlist, setuserTeamlist] = useState([]);
   const [member, setmember] = useState([]);
@@ -332,14 +333,19 @@ const addteam = async () => {
       ))}
 
       {/* Teams Section */}
-      <div id="teamlist" className="px-8 py-16 lg:px-24 bg-white">
+      <div id="teamlist" className="px-8 py-16 lg:px-24 bg-white ">
         <h2 className="text-3xl font-bold text-gray-800 mb-6">
           ทีมที่เปิดรับสมาชิก
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
           {Teamlist.map((val, key) => (
-            <div key={key} className="relative bg-gray-100 rounded-lg p-6 shadow-md hover:shadow-lg transition">
+            <div key={key} className="relative bg-gray-100 rounded-lg p-6 shadow-md hover:shadow-lg transition"          
+                onClick={async () => {
+                await setshowTeamModalOpen([true, val.TeamID])
+                showmember(val.TeamID)
+              }}
+            >
               <div className="absolute top-4 left-4  text-gray-700 text-sm font-semibold py-1 px-3 rounded-full shadow-md">
                 <span>👥 {val.CurrentMember}/{val.MaxMember}</span>
               </div>
@@ -381,20 +387,51 @@ const addteam = async () => {
 
             </div>
           ))}
+
+          {isshowTeamModalOpen[0] == true && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div className="w-full max-w-lg bg-gradient-to-b from-blue-500 to-sky-500 text-white rounded-lg p-6 shadow-lg">
+                <h1 className="text-3xl font-bold text-center mb-6 ">member</h1>
+                
+                {member.map((val,key) => (
+                  <div key={key} className="flex justify-between items-center">
+                    
+                      <p className="font-semibold text-lg">Username: {val.userName}</p>
+                      <p className="text-lg">Role: {val.role}</p>
+
+
+                      
+
+                  </div>
+                ))}
+              
+              {/* Buttons */}
+              
+                <div className="flex justify-between mt-6">
+                  <button
+                    onClick={() => setshowTeamModalOpen(false)}
+                    className="w-1/3 h-12 bg-gray-300 text-black font-bold rounded-full shadow-md hover:bg-gray-400 transition duration-300"
+                  >
+                    Close
+                  </button>
+                  
+                </div>
+              </div>
+            </div>
+        )} 
           
         {/* leave team popup */}
         {isleaveTeamModalOpen[0] == true && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="w-full max-w-lg bg-gradient-to-b from-blue-500 to-sky-500 text-white rounded-lg p-6 shadow-lg">
-              <h1 className="text-3xl font-bold text-center mb-6 ">Show member</h1>
+              <h1 className="text-3xl font-bold text-center mb-6 ">member</h1>
               
               {member.filter(val => val.userID !== UserID).map((val,key) => (
                 <div key={key} className="flex justify-between items-center">
-                <div>
-                  <h3>{val.teamID}</h3>
-                  <p>UserID: {val.userID}</p>
-                  <p>Username: {val.userName}</p>
-                </div>
+                  
+                    <p className="font-semibold text-lg">Username: {val.userName}</p>
+                    <p className="text-lg">Role: {val.role}</p>
+
 
                 {currentUserRole === 'head' && (
                   <button

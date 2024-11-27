@@ -8,6 +8,46 @@ export const teamController = new Elysia({ prefix: "/team" })
     return teams;
 })
 
+
+.get("/getTeam", async ({ query: { TeamID }, error }) => {
+    const team = await prisma.team.findFirst({
+        where: {
+          TeamID: TeamID,
+        },
+    });
+
+    if (!team) {
+        return error(404, "Team not found");
+    }
+
+    return team;
+}, {
+    query: t.Object({
+        TeamID: t.Number(),
+    }),
+})
+
+.get("/users/:teamID", async ({ params: { teamID }, error }) => {
+    const users = await prisma.userTeam.findMany({
+        where: {
+            TeamID: parseInt(teamID, 10),
+        },
+        include: {
+            User: true,
+        },
+    });
+
+    if (!users || users.length === 0) {
+        return error(404, "Users not found");
+    }
+
+    return users.map(userTeam => userTeam.User);
+}, {
+    params: t.Object({
+        teamID: t.String(),
+    }),
+})
+
 // Get TeamID from name and hackathon
 .get("/find", async ({ query: { teamName, hackathonID }, error }) => {
     const team = await prisma.team.findFirst({
@@ -29,24 +69,51 @@ export const teamController = new Elysia({ prefix: "/team" })
     }),
 })
 
-// .get("/findteambyuser/:userID", async ({ params, error }) => {
+// Check if a user is part of a team
+.get("/checkteam", async ({ query: { TeamID, UserID }, error }) => {
+    if (!TeamID || !UserID) {
+        return error(400, "TeamID and UserID are required");
+    }
 
-//     const team = await prisma.userTeam.findMany({
-//         where: {
-//             UserID: params.userID,
-//         },
-//     });
+    const teamMember = await prisma.userTeam.findFirst({
+        where: {
+            TeamID: TeamID,
+            UserID: UserID,
+        },
+    });
 
-//     if (!team || team.length === 0) {
-//         return error(404, "Team not found");
-//     }
+    if (!teamMember) {
+        return error(404, "User is not part of the team");
+    }
 
-//     return team;
-// }, {
-//     params: t.Object({
-//         userID: t.String(), // userID is a string in the URL params
-//     }),
-// })
+    return { valid: true };
+}, {
+    query: t.Object({
+        TeamID: t.Number(),
+        UserID: t.String(),
+    }),
+})
+
+// Other endpoints...
+// Get TeamID from TeamName
+.get("/getTeamID", async ({ query: { TeamName }, error }) => {
+    const team = await prisma.team.findFirst({
+        where: {
+            TeamName: TeamName,
+        },
+    });
+
+    if (!team) {
+        return error(404, "Team not found");
+    }
+
+    return {TeamID: team.TeamID};
+  }, {
+    query: t.Object({
+        TeamName: t.String(),
+    }),
+  })
+  
 .get("/finduserteam/:teamID", async ({ params, error }) => {
     const teamID = parseInt(params.teamID, 10); // Ensure teamID is a number
     if (isNaN(teamID)) {
@@ -150,40 +217,19 @@ export const teamController = new Elysia({ prefix: "/team" })
     }),
 })
 
-.delete('/delete/:teamID', async ({ params, error }) => {
+.delete("/delete/:teamID", async ({ params, error }) => {
     const { teamID } = params;
-  
-    try {
-      const teamIDNumber = parseInt(teamID, 10); // Ensure teamID is a number
-      if (isNaN(teamIDNumber)) {
-        return error(400, 'Invalid teamID');
-      }
-  
-      const team = await prisma.team.findUnique({
-        where: { TeamID: teamIDNumber },
-      });
-      
-  
-      if (!team) {
-        return error(404, 'Team not found');
-      }
-      await prisma.userTeam.deleteMany({
-        where: { TeamID: teamIDNumber },
-      })
-      await prisma.team.delete({
-        where: { TeamID: teamIDNumber },
-      });
-  
-      return { message: 'Team deleted successfully' };
-    } catch (err) {
-      console.error('Error deleting team:', err);
-      return error(500, 'Internal Server Error');
-    }
-  }, {
+
+    const team = await prisma.team.delete({
+        where: { TeamID: teamID },
+    });
+
+    return team;
+}, {
     params: t.Object({
-      teamID: t.String(), // teamID is a string in the URL params
+        teamID: t.Number(),
     }),
-  })
+})
 
 .post("/addMember", async ({ body, error }) => {
     const { teamID, userID, role } = body;

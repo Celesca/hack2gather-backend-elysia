@@ -102,35 +102,34 @@ const Rating = () => {
 
       console.log(UserID)
       console.log(ratedUserID)
-      console.log(RatingValue)
+      console.log(typeof RatingValue);
       console.log(Comment)
 
       // Add rating
-           // Add rating
-           await Axios.post(`http://localhost:3000/rating/rateuser`, {
-            ratedByID: UserID,
-            ratedUserID: ratedUserID,
-            ratingValue: RatingValue,
-            comment: Comment,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          }
-        );
-  
-        // Reset form
-        setSelectedTeam('');
-        setSelectedUser('');
-        setRatingValue('');
-        setComment('');
-        setErrorMessage('');
-        alert('บันทึกคะแนนสำเร็จ');
-      } catch (error) {
-        console.error('Error:', error);
-        setErrorMessage('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+      await Axios.post(`http://localhost:3000/rating/rateuser`, {
+        ratedByID: UserID,
+        ratedUserID: ratedUserID,
+        ratingValue: parseInt(RatingValue),
+        comment: Comment,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       }
+        );
+
+    // Reset form
+    setSelectedTeam('');
+    setSelectedUser('');
+    setRatingValue('');
+    setComment('');
+    setErrorMessage('');
+    alert('บันทึกคะแนนสำเร็จ');
+  } catch (error) {
+    console.error('Error:', error);
+    setErrorMessage('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+  }
   };
 
   return (
