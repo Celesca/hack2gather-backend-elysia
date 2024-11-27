@@ -19,7 +19,7 @@ export const teamController = new Elysia({ prefix: "/team" })
         },
     });
 
-    if (!users) {
+    if (!users || users.length === 0) {
         return error(404, "Users not found");
     }
 
@@ -30,14 +30,11 @@ export const teamController = new Elysia({ prefix: "/team" })
     }),
 })
 
-
-
-// Get TeamID from name and hackathon
-.get("/find", async ({ query: { teamName, hackathonID }, error }) => {
+// Get Team by TeamID
+.get("/getTeam", async ({ query: { TeamID }, error }) => {
     const team = await prisma.team.findFirst({
         where: {
-            TeamName: teamName,
-            HackathonID: hackathonID,
+          TeamID: TeamID,
         },
     });
 
@@ -48,43 +45,41 @@ export const teamController = new Elysia({ prefix: "/team" })
     return team;
 }, {
     query: t.Object({
-        teamName: t.String(),
-        hackathonID: t.Number(),
+        TeamID: t.Number(),
     }),
 })
 
-// check TeamName and UserID in rating
-.get("/checkteam", async ({ query: { TeamID, userID }, error }) => {
-      // ตรวจสอบ input ว่ามีค่าหรือไม่
-      if (!TeamID || !userID) {
-        return error(400, "teamID and userID are required");
-      }
+// Check if a user is part of a team
+.get("/checkteam", async ({ query: { TeamID, UserID }, error }) => {
+    if (!TeamID || !UserID) {
+        return error(400, "TeamID and UserID are required");
+    }
 
-      const teamMember = await prisma.userTeam.findFirst({
+    const teamMember = await prisma.userTeam.findFirst({
         where: {
-          TeamID: TeamID,
-          UserID: userID,
+            TeamID: TeamID,
+            UserID: UserID,
         },
-      });
+    });
 
-      if (!teamMember) {
+    if (!teamMember) {
         return error(404, "User is not part of the team");
-      }
+    }
 
-      return "User is part of the team";
-    },
-    {
-      query: t.Object({
+    return { valid: true };
+}, {
+    query: t.Object({
         TeamID: t.Number(),
-        userID: t.String(),
-      }),
-    })
+        UserID: t.String(),
+    }),
+})
 
+// Other endpoints...
 // Get TeamID from TeamName
 .get("/getTeamID", async ({ query: { TeamName }, error }) => {
     const team = await prisma.team.findFirst({
         where: {
-          TeamName: TeamName,
+            TeamName: TeamName,
         },
     });
 

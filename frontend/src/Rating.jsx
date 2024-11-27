@@ -41,6 +41,7 @@ const Rating = () => {
           console.error('Error fetching users:', error);
         }
       }
+      console.log(selectedTeam)
     };
 
     fetchUsers();
@@ -58,9 +59,9 @@ const Rating = () => {
         return;
       }
 
-      // ดึง TeamID จาก TeamName
-      const teamResponse = await Axios.get(`http://localhost:3000/team/getTeamID`, {
-        params: { TeamName: selectedTeam },
+      // Fetch TeamID from TeamName
+      const teamResponse = await Axios.get(`http://localhost:3000/team/getTeam`, {
+        params: { TeamID: selectedTeam },
       });
 
       const TeamID = teamResponse.data.TeamID;
@@ -70,22 +71,28 @@ const Rating = () => {
         return;
       }
 
-      // ดึง UserID จาก Username 
-      const userResponse = await Axios.get(`http://localhost:3000/user/getUserID`, {
-        params: { Username: selectedUser },
-      });
+      // // Store TeamID in local storage
+      // localStorage.setItem('TeamID', TeamID);
 
-      const ratedUserID = userResponse.data.userID;
+      // Fetch UserID from Username
+      const userResponse = await Axios.get(`http://localhost:3000/user/getUserID/${selectedUser}`);
 
+      console.log(userResponse.data);
+
+      
+      const ratedUserID = userResponse.data.UserID;
+      
       if (!ratedUserID) {
         setErrorMessage('ไม่พบ UserID ของ Username นี้');
         return;
       }
 
-      // ตรวจสอบว่าคนให้คะแนนอยู่ในทีมเดียวกันคนถูกให้คะแนนมั้ย
-      const checkTeam = await Axios.post(`http://localhost:3000/team/checkteam`, {
-        Teamname: selectedTeam,
-        userID: ratedUserID, // ตรวจสอบ UserID ในทีม
+      // Check if the user is part of the team
+      const checkTeam = await Axios.get(`http://localhost:3000/team/checkteam`, {
+        params: {
+          TeamID: TeamID,
+          UserID: ratedUserID,
+        },
       });
 
       if (!checkTeam.data.valid) {
@@ -93,31 +100,37 @@ const Rating = () => {
         return;
       }
 
-      // เพิ่มข้อมูลลงในตาราง userteam
-      await Axios.post(`http://localhost:3000/rating/rateuser`, {
-          ratedByID: UserID,
-          ratedUserID,
-          RatingValue: RatingValue,
-          Comment,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      );
+      console.log(UserID)
+      console.log(ratedUserID)
+      console.log(RatingValue)
+      console.log(Comment)
 
-      // รีเซ็ตฟอร์ม
-      setSelectedTeam('');
-      setSelectedUser('');
-      setRatingValue('');
-      setComment('');
-      setErrorMessage('');
-      alert('บันทึกคะแนนสำเร็จ');
-    } catch (error) {
-      console.error('Error:', error);
-      setErrorMessage('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-    }
+      // Add rating
+           // Add rating
+           await Axios.post(`http://localhost:3000/rating/rateuser`, {
+            ratedByID: UserID,
+            ratedUserID: ratedUserID,
+            ratingValue: RatingValue,
+            comment: Comment,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        );
+  
+        // Reset form
+        setSelectedTeam('');
+        setSelectedUser('');
+        setRatingValue('');
+        setComment('');
+        setErrorMessage('');
+        alert('บันทึกคะแนนสำเร็จ');
+      } catch (error) {
+        console.error('Error:', error);
+        setErrorMessage('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+      }
   };
 
   return (
@@ -148,7 +161,7 @@ const Rating = () => {
             >
               <option value="" disabled>Select User</option>
               {users.map((user) => (
-                <option key={user.UserID} value={user.UserName}>
+                <option key={user.UserID} value={user.UserID}>
                   {user.UserName}
                 </option>
               ))}
