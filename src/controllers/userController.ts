@@ -255,24 +255,26 @@ export const userController = new Elysia({ prefix: "/user" })
       return users; // Return all users with related skills and notifications
     })
 
-  // Get UserID from Username
-  .get("/getUserID", async ({ query: { UserName }, error }) => {
-    const user = await prisma.user.findFirst({
-        where: {
-          UserName: UserName,
-        },
-    });
-  
-    if (!user) {
-        return error(404, "User not found");
-    }
-  
-    return {userID: user.UserID};
+    
+    // Get user details from Username
+    .get("/getUserID/:UserID", async ({params,  error }) => {
+      const user = await prisma.user.findFirst({
+          where: {
+            UserID: params.UserID,
+          },
+      });
+    
+      if (!user) {
+          return error(404, "User not found");
+      }
+    
+      return { UserID : user.UserID , UserName : user.UserName};
     }, {
-    query: t.Object({
-        UserName: t.String(),
+      params: t.Object({
+          UserID: t.String(),
       }),
     })
+    
 
   // Delete user profile
   .delete(
@@ -300,3 +302,9 @@ export const userController = new Elysia({ prefix: "/user" })
       }),
     }
   );
+
+
+
+  // .get (
+  //   "/GetId", 
+  // )

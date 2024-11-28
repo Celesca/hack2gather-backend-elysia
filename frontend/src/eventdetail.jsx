@@ -8,6 +8,7 @@ const EventDetail = () => {
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
   const [isjoinTeamModalOpen, setIsjoinTeamModalOpen] = useState([false,'']);
   const [isleaveTeamModalOpen, setleaveTeamModalOpen] = useState([false,'']);
+  const [isshowTeamModalOpen, setshowTeamModalOpen] = useState([false,'']);
   const [Teamlist, setTeamlist] = useState([]);
   const [userTeamlist, setuserTeamlist] = useState([]);
   const [member, setmember] = useState([]);
@@ -26,7 +27,74 @@ const EventDetail = () => {
    useEffect(() => {
     console.log('member:', member);
   }, [member]);
+
+  const checkteam = async (TeamID) => {
+    try {
+      const responsed = await Axios.get(`http://localhost:3000/team/finduserteam/${TeamID}`);
+      const team = responsed.data;
+      const currentUser = team.find(member => member.UserID === UserID);
+      if (currentUser) {
+        Swal.fire({
+          title: "Sorry",
+          text: "You are in the team !",
+          icon: "error"
+        });
+        setTimeout(() => {
+          Swal.close();
+        }, 3000);
   
+        await new Promise(resolve => setTimeout(resolve, 2000));
+  
+        window.location.href = `/EventDetail/${HackathonID}`;}
+    } catch (error) {
+      console.error("Error deleting from team:", error);
+    }
+  }
+
+
+  const deleteteam = async (TeamID) => {
+    try {
+      const responsed = await Axios.get(`http://localhost:3000/team/finduserteam/${TeamID}`);
+      const team = responsed.data;
+      const currentUser = team.find(member => member.UserID === UserID);
+      if (currentUser) {
+         setCurrentUserRole(currentUser.role)}
+      
+      if (currentUserRole === 'head'){
+      const response = await Axios.delete(`http://localhost:3000/team/delete/${TeamID}`,TeamID);
+      console.log('Delete response:', response.data);
+      Swal.fire({
+        title: "Congratulation",
+        text: "Delete team success !",
+        icon: "success"
+      });
+      setTimeout(() => {
+        Swal.close();
+      }, 3000);
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      window.location.href = `/EventDetail/${HackathonID}`;
+    }
+    else{
+      Swal.fire({
+        title: "Sorry",
+        text: "You don't have permission to delete team !",
+        icon: "error"
+      });
+      setTimeout(() => {
+        Swal.close();
+      }, 3000);
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      window.location.href = `/EventDetail/${HackathonID}`;
+    }} catch (error) {
+      console.error("Error deleting from team:", error);
+    }
+  }
+
+  //delete members from team
   const deletefromteam = async (TeamID, UserID) => {
     try {
       const response = await Axios.delete(`http://localhost:3000/team/removeMember`, {
@@ -43,9 +111,9 @@ const EventDetail = () => {
       });
       setTimeout(() => {
         Swal.close();
-      }, 3000);
+      }, 1000);
 
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       window.location.href = `/EventDetail/${HackathonID}`;
     } catch (error) {
@@ -99,6 +167,19 @@ const EventDetail = () => {
         window.location.href = `/EventDetail/${HackathonID}`;
       }
       else{
+        
+      const payloadt = {
+            teamID: TeamID,
+            userID: UserID,
+            role: role
+            };
+        console.log('Payload:', payloadt);
+        await Axios.post('http://localhost:3000/team/addMember', payloadt);
+        setuserTeamlist((prev) => [
+            ...prev,
+            { teamID: TeamID, userID: UserID, role: role },
+        ]);
+
         Swal.fire({
           title: "Good job!",
           text: "Join team Sucessful!",
@@ -112,18 +193,6 @@ const EventDetail = () => {
     
         // localStorage.setItem('UserID', JSON.stringify(response.data.UserID));
         window.location.href = `/EventDetail/${HackathonID}`;
-      
-      const payloadt = {
-            teamID: TeamID,
-            userID: UserID,
-            role: role
-            };
-        console.log('Payload:', payloadt);
-        await Axios.post('http://localhost:3000/team/addMember', payloadt);
-        setuserTeamlist((prev) => [
-            ...prev,
-            { teamID: TeamID, userID: UserID, role: role },
-        ]);
       }
     } catch (error) {
         console.error("Error joining team:", error);
@@ -166,6 +235,18 @@ const addteam = async () => {
       ]);
 
       console.log('Team created successfully');
+      Swal.fire({
+        title: "Congratulation",
+        text: "Create team success !",
+        icon: "success"
+      });
+      setTimeout(() => {
+        Swal.close();
+      }, 3000);
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      window.location.href = `/EventDetail/${HackathonID}`;
   } catch (error) {
       console.error('Error creating team:', error.response?.data || error.message);
   }
@@ -252,18 +333,36 @@ const addteam = async () => {
       ))}
 
       {/* Teams Section */}
-      <div id="teamlist" className="px-8 py-16 lg:px-24 bg-white">
+      <div id="teamlist" className="px-8 py-16 lg:px-24 bg-white ">
         <h2 className="text-3xl font-bold text-gray-800 mb-6">
           ทีมที่เปิดรับสมาชิก
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
           {Teamlist.map((val, key) => (
-            <div key={key} className="relative bg-gray-100 rounded-lg p-6 shadow-md hover:shadow-lg transition">
+            <div key={key} className="relative bg-gray-100 rounded-lg p-6 shadow-md hover:shadow-lg transition"          
+                onClick={async () => {
+                await setshowTeamModalOpen([true, val.TeamID])
+                showmember(val.TeamID)
+              }}
+            >
               <div className="absolute top-4 left-4  text-gray-700 text-sm font-semibold py-1 px-3 rounded-full shadow-md">
                 <span>👥 {val.CurrentMember}/{val.MaxMember}</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-700 mt-8">Team {val.TeamName}</h3>
+
+               
+              <div className="absolute top-4 right-4">
+                <button
+                  onClick={() => deleteteam(val.TeamID)}
+                  className="ml-2 bg-red-500/80 text-white rounded-full p-1.5
+                           hover:bg-red-600 transition-all duration-300 transform hover:rotate-180"
+                >
+                  ✖
+                </button>
+              </div>
+              
+
               <div className="absolute bottom-4 right-4 flex space-x-2">
                 <button
                   onClick={async () => {
@@ -274,8 +373,12 @@ const addteam = async () => {
                 >
                   Delete Member
                 </button>
+
                 <button
-                  onClick={() => setIsjoinTeamModalOpen([true, val.TeamID, val.CurrentMember, val.MaxMember])}
+                  onClick={async () => {
+                    await setIsjoinTeamModalOpen([true, val.TeamID, val.CurrentMember, val.MaxMember])
+                    checkteam(val.TeamID)
+                  }}
                   className="px-3 py-1 bg-gradient-to-r from-blue-400 to-blue-500 text-white font-semibold rounded-full shadow-md hover:from-blue-500 hover:to-blue-600 transition-transform transform hover:-translate-y-1 hover:scale-105"
                 >
                   Join Team
@@ -284,20 +387,51 @@ const addteam = async () => {
 
             </div>
           ))}
+
+          {isshowTeamModalOpen[0] == true && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div className="w-full max-w-lg bg-gradient-to-b from-blue-500 to-sky-500 text-white rounded-lg p-6 shadow-lg">
+                <h1 className="text-3xl font-bold text-center mb-6 ">member</h1>
+                
+                {member.map((val,key) => (
+                  <div key={key} className="flex justify-between items-center">
+                    
+                      <p className="font-semibold text-lg">Username: {val.userName}</p>
+                      <p className="text-lg">Role: {val.role}</p>
+
+
+                      
+
+                  </div>
+                ))}
+              
+              {/* Buttons */}
+              
+                <div className="flex justify-between mt-6">
+                  <button
+                    onClick={() => setshowTeamModalOpen(false)}
+                    className="w-1/3 h-12 bg-gray-300 text-black font-bold rounded-full shadow-md hover:bg-gray-400 transition duration-300"
+                  >
+                    Close
+                  </button>
+                  
+                </div>
+              </div>
+            </div>
+        )} 
           
         {/* leave team popup */}
         {isleaveTeamModalOpen[0] == true && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="w-full max-w-lg bg-gradient-to-b from-blue-500 to-sky-500 text-white rounded-lg p-6 shadow-lg">
-              <h1 className="text-3xl font-bold text-center mb-6 ">Show member</h1>
+              <h1 className="text-3xl font-bold text-center mb-6 ">member</h1>
               
               {member.filter(val => val.userID !== UserID).map((val,key) => (
                 <div key={key} className="flex justify-between items-center">
-                <div>
-                  <h3>{val.teamID}</h3>
-                  <p>UserID: {val.userID}</p>
-                  <p>Username: {val.userName}</p>
-                </div>
+                  
+                    <p className="font-semibold text-lg">Username: {val.userName}</p>
+                    <p className="text-lg">Role: {val.role}</p>
+
 
                 {currentUserRole === 'head' && (
                   <button

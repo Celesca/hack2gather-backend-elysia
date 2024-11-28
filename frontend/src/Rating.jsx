@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Axios from 'axios';
+import Swal from 'sweetalert2'
 
 const Rating = () => {
   const [teams, setTeams] = useState([]);
@@ -41,6 +42,7 @@ const Rating = () => {
           console.error('Error fetching users:', error);
         }
       }
+      console.log(selectedTeam)
     };
 
     fetchUsers();
@@ -58,9 +60,9 @@ const Rating = () => {
         return;
       }
 
-      // ดึง TeamID จาก TeamName
-      const teamResponse = await Axios.get(`http://localhost:3000/team/getTeamID`, {
-        params: { TeamName: selectedTeam },
+      // Fetch TeamID from TeamName
+      const teamResponse = await Axios.get(`http://localhost:3000/team/getTeam`, {
+        params: { TeamID: selectedTeam },
       });
 
       const TeamID = teamResponse.data.TeamID;
@@ -70,54 +72,94 @@ const Rating = () => {
         return;
       }
 
-      // ดึง UserID จาก Username 
-      const userResponse = await Axios.get(`http://localhost:3000/user/getUserID`, {
-        params: { Username: selectedUser },
-      });
+      // // Store TeamID in local storage
+      localStorage.setItem('TeamID', TeamID);
 
-      const ratedUserID = userResponse.data.userID;
+      // Fetch UserID from Username
+      const userResponse = await Axios.get(`http://localhost:3000/user/getUserID/${selectedUser}`);
 
+      console.log(userResponse.data);
+
+      
+      const ratedUserID = userResponse.data.UserID;
+
+
+      
       if (!ratedUserID) {
         setErrorMessage('ไม่พบ UserID ของ Username นี้');
         return;
       }
 
-      // ตรวจสอบว่าคนให้คะแนนอยู่ในทีมเดียวกันคนถูกให้คะแนนมั้ย
-      const checkTeam = await Axios.post(`http://localhost:3000/team/checkteam`, {
-        Teamname: selectedTeam,
-        userID: ratedUserID, // ตรวจสอบ UserID ในทีม
+      console.log(ratedUserID)
+      console.log(UserID)
+
+      // Check if the user is part of the team
+      const checkTeam = await Axios.get(`http://localhost:3000/team/checkteam`, {
+        params: {
+          TeamID: TeamID,
+          UserID: UserID,
+        },
       });
 
+
+ 
       if (!checkTeam.data.valid) {
-        setErrorMessage('คุณไม่ได้อยู่ทีมเดียวกัน กรุณาลองใหม่อีกครั้ง');
+        setErrorMessage('คุณไม่ได้เป็นสมาชิกของทีมนี้');
         return;
       }
 
-      // เพิ่มข้อมูลลงในตาราง userteam
-      await Axios.post(`http://localhost:3000/rating/rateuser`, {
-          ratedByID: UserID,
-          ratedUserID,
-          RatingValue: RatingValue,
-          Comment,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      );
 
-      // รีเซ็ตฟอร์ม
-      setSelectedTeam('');
-      setSelectedUser('');
-      setRatingValue('');
-      setComment('');
-      setErrorMessage('');
-      alert('บันทึกคะแนนสำเร็จ');
-    } catch (error) {
-      console.error('Error:', error);
-      setErrorMessage('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-    }
+
+      // Add rating
+      await Axios.post(`http://localhost:3000/rating/rateuser`, {
+        ratedByID: UserID,
+        ratedUserID: ratedUserID,
+        ratingValue: parseInt(RatingValue),
+        comment: Comment,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+        );
+
+    // Reset form
+    setSelectedTeam('');
+    setSelectedUser('');
+    setRatingValue('');
+    setComment('');
+    setErrorMessage('');
+
+    Swal.fire({
+      title: "Good job!",
+      text: " Add rating sucessfully!",
+      icon: "success"
+    });
+    setTimeout(() => {
+      Swal.close();
+    }, 3000);
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    window.location.href = '/Rating';
+    
+
+  } catch (error) {
+    console.error('Error adding rating:', error);
+    Swal.fire({
+      title: "Error!",
+      text: "ํYou're not a member of this team!",
+      icon: "error"
+    });
+    setTimeout(() => {
+      Swal.close();
+    }, 3000);
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    window.location.href = '/Rating';
+  }
   };
 
   return (
@@ -148,7 +190,7 @@ const Rating = () => {
             >
               <option value="" disabled>Select User</option>
               {users.map((user) => (
-                <option key={user.UserID} value={user.UserName}>
+                <option key={user.UserID} value={user.UserID}>
                   {user.UserName}
                 </option>
               ))}

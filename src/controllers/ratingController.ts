@@ -28,7 +28,8 @@ export const ratingController = new Elysia({ prefix: "/rating" })
     }),
 })
 
-// Rating to someone
+
+// Rate someone
 .post("/rateuser", async ({ body, error }) => {
     const { ratedByID, ratedUserID, ratingValue, comment } = body;
 
@@ -71,6 +72,8 @@ export const ratingController = new Elysia({ prefix: "/rating" })
     }),
 })
 
+// Other endpoints...
+
 // Update rating
 .put("/:userRatingID", async ({ params, body, error }) => {
     const { userRatingID } = params;
@@ -103,4 +106,4 @@ export const ratingController = new Elysia({ prefix: "/rating" })
         ratingValue: t.Optional(t.Number()),
         comment: t.Optional(t.String()),
     }),
-});
+})
