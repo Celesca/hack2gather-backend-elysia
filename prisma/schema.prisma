@@ -128,7 +128,6 @@ model UserTeam {
   Team       Team     @relation(fields: [TeamID], references: [TeamID])
   TeamID     Int
   Role       String // Role of the user in the team (e.g., Member, Leader)
-  JoinedAt   DateTime @default(now())
 }
 
 model PersonalType {
