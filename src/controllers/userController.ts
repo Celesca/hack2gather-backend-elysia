@@ -116,8 +116,8 @@ export const userController = new Elysia({ prefix: "/user" })
     }
   )
 
-  // Get user details by userID
-  .get("/id/:UserID", async ({ params: { UserID }, error }) => {
+   // Get user details by userID
+   .get("/id/:UserID", async ({ params: { UserID }, error }) => {
     const user = await prisma.user.findUnique({
       where: { UserID: UserID },
       select: {
@@ -130,6 +130,11 @@ export const userController = new Elysia({ prefix: "/user" })
         Age: true,
         Location: true,
         AverageRating: true,
+        RatingsReceived: {
+          select: {
+            RatingValue: true,
+          },
+        },
       },
     });
 
@@ -137,8 +142,14 @@ export const userController = new Elysia({ prefix: "/user" })
       return error(404, "User not found");
     }
 
-    return user;
+    // Calculate the average rating
+    const averageRating = user.RatingsReceived.length > 0
+      ? user.RatingsReceived.reduce((sum, rating) => sum + rating.RatingValue, 0) / user.RatingsReceived.length
+      : 0;
+
+    return { ...user, AverageRating: averageRating };
   })
+
 
   // Get user details by userID with related skills and notifications
   .get(
