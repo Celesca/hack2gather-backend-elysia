@@ -160,6 +160,49 @@ const Dashboard = () => {
     window.location.href = '/AllUsers';
   }
 
+
+  // Add the following function inside the Dashboard component
+
+const deleteHackathon = async (hackathonID, hackathonName) => {
+  const result = await Swal.fire({
+    title: `Delete ${hackathonName}?`,
+    text: "Are you sure you want to delete this hackathon?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+  });
+
+  if (result.isConfirmed) {
+    try {
+      await Axios.delete('http://localhost:3000/hackathon/delete', {
+        data: { id: hackathonID },
+      });
+
+      Swal.fire({
+        title: "Deleted!",
+        text: `${hackathonName} has been deleted.`,
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      // Refresh hackathons list
+      const response = await Axios.get('http://localhost:3000/hackathon');
+      setHackathons(response.data);
+    } catch (error) {
+      console.error(`Error deleting ${hackathonName}:`, error);
+      Swal.fire({
+        title: "Error",
+        text: `There was an error deleting ${hackathonName}.`,
+        icon: "error",
+      });
+    }
+  }
+};
+
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-8">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -238,38 +281,47 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Hackathons Section */}
-        <div className="bg-white rounded-xl shadow-xl p-8 transform hover:shadow-2xl transition-all duration-300">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-800 border-b pb-4 relative">
-            Hackathon Management
-            <span className="absolute bottom-0 left-0 w-1/4 h-1 bg-gradient-to-r from-blue-400 to-indigo-500"></span>
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {hackathons.map((hackathon) => (
-              <div key={hackathon.HackathonID} className="relative group perspective-1000">
-                <button 
-                  className="w-full group flex flex-col items-center justify-center p-6 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white rounded-xl transition-all duration-500 transform hover:scale-110 hover:rotate-2 hover:shadow-xl backdrop-blur-sm"
-                >
-                  <span className="text-3xl mb-3 transform group-hover:scale-125 group-hover:rotate-12 transition-transform duration-300">
-                    🏆
-                  </span>
-                  <span className="font-semibold tracking-wide group-hover:text-blue-100">
-                    {hackathon.Name}
-                  </span>
-                </button>
-              </div>
-            ))}
-            <button 
-              onClick={handleAddHackathon}
-              className="group flex flex-col items-center justify-center p-6 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-blue-500 text-white rounded-xl transition-all duration-500 transform hover:scale-110 hover:-rotate-2 hover:shadow-xl"
-            >
-              <span className="text-3xl mb-3 transform group-hover:rotate-180 transition-transform duration-500">➕</span>
-              <span className="font-semibold tracking-wide group-hover:text-indigo-100">
-                Add more hackathon
-              </span>
-            </button>
-          </div>
-        </div>
+
+{/* Hackathons Section */}
+<div className="bg-white rounded-xl shadow-xl p-8 transform hover:shadow-2xl transition-all duration-300">
+  <h2 className="text-2xl font-semibold mb-6 text-gray-800 border-b pb-4 relative">
+    Hackathon Management
+    <span className="absolute bottom-0 left-0 w-1/4 h-1 bg-gradient-to-r from-blue-400 to-indigo-500"></span>
+  </h2>
+  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {hackathons.map((hackathon) => (
+      <div key={hackathon.HackathonID} className="relative group perspective-1000">
+        <button 
+          className="w-full group flex flex-col items-center justify-center p-6 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white rounded-xl transition-all duration-500 transform hover:scale-110 hover:rotate-2 hover:shadow-xl backdrop-blur-sm"
+        >
+          <span className="text-3xl mb-3 transform group-hover:scale-125 group-hover:rotate-12 transition-transform duration-300">
+            🏆
+          </span>
+          <span className="font-semibold tracking-wide group-hover:text-blue-100">
+            {hackathon.Name}
+          </span>
+        </button>
+        <button
+          onClick={() => deleteHackathon(hackathon.HackathonID, hackathon.Name)}
+          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300 hover:bg-red-600 hover:rotate-90 shadow-lg"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    ))}
+    <button 
+      onClick={handleAddHackathon}
+      className="group flex flex-col items-center justify-center p-6 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-blue-500 text-white rounded-xl transition-all duration-500 transform hover:scale-110 hover:-rotate-2 hover:shadow-xl"
+    >
+      <span className="text-3xl mb-3 transform group-hover:rotate-180 transition-transform duration-500">➕</span>
+      <span className="font-semibold tracking-wide group-hover:text-indigo-100">
+        Add more hackathon
+      </span>
+    </button>
+  </div>
+</div>
 
         {/* Users Section */}
         <div className="bg-white rounded-xl shadow-xl p-8">

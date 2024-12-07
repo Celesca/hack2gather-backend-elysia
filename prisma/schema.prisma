@@ -48,6 +48,9 @@ model UserRating {
   RatingValue  Int      // Rating value (e.g., 1-5 stars)
   Comment      String?  // Optional comment
   CreatedAt    DateTime @default(now())
+
+  @@unique([RatedByID, RatedUserID], name: "ratedByRatedUser_unique")
+
 }
 
 model Message {
@@ -115,7 +118,7 @@ model Team {
   MaxMember   Int
   CurrentMember Int
   Hackathon   Hackathon  @relation(fields: [HackathonID], references: [HackathonID])
-  UserTeams   UserTeam[] // Relation to UserTeam (many-to-many with Users)
+  UserTeams   UserTeam[]    // Relation to UserTeam (many-to-many with Users)
   CreatedAt   DateTime   @default(now())
   UpdatedAt   DateTime   @updatedAt
 }
@@ -125,10 +128,12 @@ model UserTeam {
   User       User     @relation(fields: [UserID], references: [UserID])
   UserID     String
   UserName   String
-  Team       Team     @relation(fields: [TeamID], references: [TeamID])
+  Team       Team     @relation(fields: [TeamID], references: [TeamID], onDelete: Cascade)
   TeamID     Int
   Role       String // Role of the user in the team (e.g., Member, Leader)
   JoinedAt   DateTime @default(now())
+  @@unique([TeamID, UserID], name: "Team_User_Unique")
+
 }
 
 model PersonalType {

@@ -8,45 +8,68 @@ export const teamController = new Elysia({ prefix: "/team" })
     return teams;
 })
 
-
 .get("/getTeam", async ({ query: { TeamID }, error }) => {
     const team = await prisma.team.findFirst({
-        where: {
-          TeamID: TeamID,
-        },
+      where: {
+        TeamID: TeamID,
+      },
     });
 
     if (!team) {
-        return error(404, "Team not found");
+      return error(404, "Team not found");
     }
 
     return team;
-}, {
+  }, {
     query: t.Object({
-        TeamID: t.Number(),
+      TeamID: t.Number(),
     }),
-})
+  })
 
-.get("/users/:teamID", async ({ params: { teamID }, error }) => {
+  .get("/users/:teamID", async ({ params: { teamID }, error }) => {
     const users = await prisma.userTeam.findMany({
-        where: {
-            TeamID: parseInt(teamID, 10),
-        },
-        include: {
-            User: true,
-        },
+      where: {
+        TeamID: parseInt(teamID, 10),
+      },
+      include: {
+        User: true,
+      },
     });
 
     if (!users || users.length === 0) {
-        return error(404, "Users not found");
+      return error(404, "Users not found");
     }
 
     return users.map(userTeam => userTeam.User);
-}, {
+  }, {
     params: t.Object({
-        teamID: t.String(),
+      teamID: t.String(),
     }),
-})
+  })
+
+  // **New Endpoint: Get Teams for a User**
+  .get("/user/:userId", async ({ params: { userId }, error }) => {
+    const userTeams = await prisma.userTeam.findMany({
+      where: {
+        UserID: userId,
+      },
+      include: {
+        Team: true, // Ensure that the Team relation is included
+      },
+    });
+
+    if (!userTeams || userTeams.length === 0) {
+      return error(404, "User is not part of any teams");
+    }
+
+    // Extract and return the team details
+    const teams = userTeams.map(userTeam => userTeam.Team);
+    return teams;
+  }, {
+    params: t.Object({
+      userId: t.String(),
+    }),
+  })
 
 // Get TeamID from name and hackathon
 .get("/find", async ({ query: { teamName, hackathonID }, error }) => {
@@ -217,114 +240,161 @@ export const teamController = new Elysia({ prefix: "/team" })
     }),
 })
 
-.delete("/delete/:teamID", async ({ params, error }) => {
+.delete("/delete/:teamID", async ({ params, body, error }) => {
     const { teamID } = params;
-
-    const team = await prisma.team.delete({
-        where: { TeamID: teamID },
-    });
-
-    return team;
-}, {
+    const { UserID } = body;
+  
+    // Validate presence of UserID
+    if (!UserID) {
+      return error(400, "UserID is required.");
+    }
+  
+    // Validate TeamID
+    const parsedTeamID = parseInt(teamID, 10);
+    if (isNaN(parsedTeamID)) {
+      return error(400, "Invalid TeamID.");
+    }
+  
+    try {
+      // Verify the user's role in the team using the named composite unique key
+      const teamMember = await prisma.userTeam.findUnique({
+        where: {
+          Team_User_Unique: { // Use the named constraint
+            TeamID: parsedTeamID,
+            UserID: UserID,
+          },
+        },
+        select: {
+          Role: true,
+        },
+      });
+  
+      if (!teamMember) {
+        return error(404, "Team member not found.");
+      }
+  
+      if (teamMember.Role.toLowerCase() !== 'head') {
+        return error(403, "You don't have permission to delete this team.");
+      }
+  
+      // Delete the team (cascade will handle UserTeam deletion)
+      const deletedTeam = await prisma.team.delete({
+        where: { TeamID: parsedTeamID },
+      });
+  
+      return deletedTeam;
+    } catch (err) {
+      console.error("Error deleting team:", err);
+      return error(500, "Internal server error.");
+    }
+  }, {
     params: t.Object({
-        teamID: t.Number(),
+      teamID: t.String(), // URL params are strings
     }),
-})
+    body: t.Object({
+      UserID: t.String(),
+    }),
+  })
 
-.post("/addMember", async ({ body, error }) => {
+  .post("/addMember", async ({ body, error }) => {
     const { teamID, userID, role } = body;
+    if (!teamID || !userID || !role) {
+      return error(400, "teamID, userID, and role are required.");
+    }
 
-    const team = await prisma.team.findUnique({
+    try {
+      // Check if the team exists
+      const team = await prisma.team.findUnique({
         where: { TeamID: teamID },
-    });
+      });
 
-    if (!team) {
-        return error(404, "Team not found");
-    }
+      if (!team) {
+        return error(404, "Team not found.");
+      }
 
-    const user = await prisma.user.findUnique({
-        where: { UserID: userID },
-    });
-
-    if (!user) {
-        return error(404, "User not found");
-    }
-
-    const member = await prisma.userTeam.findFirst({
-        where: { TeamID: teamID, UserID: userID },
-    });
-
-    if (member) {
-        return error(400, "User is already a member of the team");
-    }
-
-    // Check the maxNUmber and the currentMember of the team
-    if (team.CurrentMember >= team.MaxMember) {
-        return error(400, "Team is full");
-    }
-
-    const response = await prisma.userTeam.create({
-        data: {
+      // Check if the user is already a member
+      const existingMember = await prisma.userTeam.findUnique({
+        where: {
+          Team_User_Unique: { // Use the named constraint
             TeamID: teamID,
             UserID: userID,
-            UserName: user.UserName,
-            Role: role,
+          },
         },
-    });
+      });
 
-    // Add the current member count
-    await prisma.team.update({
+      if (existingMember) {
+        return error(400, "User is already a member of this team.");
+      }
+
+      // Add member to the team
+      const newMember = await prisma.userTeam.create({
+        data: {
+          TeamID: teamID,
+          UserID: userID,
+          Role: role,
+          UserName: "", // You might want to fetch and set the UserName here
+        },
+      });
+
+      // Update the current member count
+      await prisma.team.update({
         where: { TeamID: teamID },
         data: {
-            CurrentMember: team.CurrentMember + 1,
+          CurrentMember: {
+            increment: 1,
+          },
         },
-    });
+      });
 
-    return response;
-}, {
+      return newMember;
+    } catch (err) {
+      console.error("Error adding member:", err);
+      return error(500, "Internal server error.");
+    }
+  }, {
     body: t.Object({
-        teamID: t.Number(),
-        userID: t.String(),
-        role: t.String(),
+      teamID: t.Number(),
+      userID: t.String(),
+      role: t.String(),
     }),
-})
+  })
 
 // Remove member from team
 .delete("/removeMember", async ({ body, error }) => {
     const { teamID, userID } = body;
 
     const team = await prisma.team.findUnique({
-        where: { TeamID: teamID },
+      where: { TeamID: teamID },
     });
 
     if (!team) {
-        return error(404, "Team not found");
+      return error(404, "Team not found");
     }
 
     const member = await prisma.userTeam.findFirst({
-        where: { TeamID: teamID, UserID: userID },
+      where: { TeamID: teamID, UserID: userID },
     });
 
     if (!member) {
-        return error(404, "User is not a member of the team");
+      return error(404, "User is not a member of the team");
     }
 
     const response = await prisma.userTeam.delete({
-        where: { UserTeamID: member.UserTeamID },
+      where: { UserTeamID: member.UserTeamID },
     });
 
     // Remove the current member count
     await prisma.team.update({
-        where: { TeamID: teamID },
-        data: {
-            CurrentMember: team.CurrentMember - 1,
-        },
+      where: { TeamID: teamID },
+      data: {
+        CurrentMember: team.CurrentMember - 1,
+      },
     });
 
     return response;
-}, {
+  }, {
     body: t.Object({
-        teamID: t.Number(),
-        userID: t.String(),
+      teamID: t.Number(),
+      userID: t.String(),
     }),
-})
+  });

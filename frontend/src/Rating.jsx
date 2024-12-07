@@ -54,113 +54,121 @@ const Rating = () => {
         setErrorMessage('คุณต้องล็อกอินก่อนเพื่อให้คะแนน');
         return;
       }
-
+  
       if (RatingValue < 1 || RatingValue > 5) {
         setErrorMessage('กรุณากรอกคะแนนระหว่าง 1 ถึง 5 เป็นจำนวนเต็ม');
         return;
       }
-
+  
+      // Prevent self-rating on frontend
+      // Fetch UserID from Username
+      if (selectedUser === UserID) {
+        setErrorMessage('คุณไม่สามารถให้คะแนนตัวเองได้');
+        return;
+      }
+  
       // Fetch TeamID from TeamName
       const teamResponse = await Axios.get(`http://localhost:3000/team/getTeam`, {
         params: { TeamID: selectedTeam },
       });
-
+  
       const TeamID = teamResponse.data.TeamID;
-
+  
       if (!TeamID) {
         setErrorMessage('ไม่พบ TeamID ของทีมนี้');
         return;
       }
-
+  
       // // Store TeamID in local storage
       localStorage.setItem('TeamID', TeamID);
-
+  
       // Fetch UserID from Username
       const userResponse = await Axios.get(`http://localhost:3000/user/getUserID/${selectedUser}`);
-
-      console.log(userResponse.data);
-
-      
+  
       const ratedUserID = userResponse.data.UserID;
-
-
-      
+  
       if (!ratedUserID) {
         setErrorMessage('ไม่พบ UserID ของ Username นี้');
         return;
       }
 
-      console.log(ratedUserID)
-      console.log(UserID)
-
-      // Check if the user is part of the team
-      const checkTeam = await Axios.get(`http://localhost:3000/team/checkteam`, {
+       // Check if the user is part of the team
+       const checkTeam = await Axios.get(`http://localhost:3000/team/checkteam`, {
         params: {
           TeamID: TeamID,
           UserID: UserID,
         },
       });
-
-
- 
+  
       if (!checkTeam.data.valid) {
         setErrorMessage('คุณไม่ได้เป็นสมาชิกของทีมนี้');
         return;
       }
 
+ // **Check for existing rating**
+ const existingRating = await Axios.get(`http://localhost:3000/rating/${ratedUserID}`, {
+  params: { ratedUserID },
+});
 
+const hasRated = existingRating.data.some(
+  (rating) => rating.RatedByID === UserID && rating.RatedUserID === ratedUserID
+);
 
-      // Add rating
-      await Axios.post(`http://localhost:3000/rating/rateuser`, {
-        ratedByID: UserID,
-        ratedUserID: ratedUserID,
-        ratingValue: parseInt(RatingValue),
-        comment: Comment,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      }
-        );
+if (hasRated) {
+  setErrorMessage('You have rated this user.');
+  return;
+}
 
-    // Reset form
-    setSelectedTeam('');
-    setSelectedUser('');
-    setRatingValue('');
-    setComment('');
-    setErrorMessage('');
-
-    Swal.fire({
-      title: "Good job!",
-      text: " Add rating sucessfully!",
-      icon: "success"
-    });
-    setTimeout(() => {
-      Swal.close();
-    }, 3000);
-
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    window.location.href = '/Rating';
-    
-
-  } catch (error) {
-    console.error('Error adding rating:', error);
-    Swal.fire({
-      title: "Error!",
-      text: "ํYou're not a member of this team!",
-      icon: "error"
-    });
-    setTimeout(() => {
-      Swal.close();
-    }, 3000);
-
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    window.location.href = '/Rating';
+// Add rating
+await Axios.post(`http://localhost:3000/rating/rateuser`, {
+  ratedByID: UserID,
+  ratedUserID: ratedUserID,
+  ratingValue: parseInt(RatingValue),
+  comment: Comment,
+},
+  {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
   }
-  };
+);
+
+// Reset form
+setSelectedTeam('');
+setSelectedUser('');
+setRatingValue('');
+setComment('');
+setErrorMessage('');
+
+Swal.fire({
+  title: "Good job!",
+  text: " Add rating successfully!",
+  icon: "success"
+});
+setTimeout(() => {
+  Swal.close();
+}, 3000);
+
+await new Promise(resolve => setTimeout(resolve, 2000));
+
+window.location.href = '/Rating';
+
+} catch (error) {
+console.error('Error adding rating:', error);
+Swal.fire({
+  title: "Error!",
+  text: "You cannot rate this user!!",
+  icon: "error"
+});
+setTimeout(() => {
+  Swal.close();
+}, 3000);
+
+await new Promise(resolve => setTimeout(resolve, 2000));
+
+window.location.href = '/Rating';
+}
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-200 to-indigo-400 flex items-center justify-center p-4">
